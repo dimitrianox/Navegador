@@ -1,0 +1,14 @@
+stages:
+  - deploy
+
+pages:
+  stage: deploy
+  script:
+    - mkdir public
+    # Copia tus carpetas web esenciales a la carpeta public (ajusta los nombres si usas otros)
+    - cp -r index.html css/ js/ assets/ public/ || true
+  artifacts:
+    paths:
+      - public
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
