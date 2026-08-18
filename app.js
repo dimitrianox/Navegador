@@ -100,17 +100,59 @@
     state.primaryVisible = !state.primaryVisible;
   }
 
-  function loadImage(image, source) {
+function loadImage(image, source) {
     return new Promise((resolve, reject) => {
-      const clean = () => { image.removeEventListener("load", loaded); image.removeEventListener("error", failed); };
-      const loaded = () => { clean(); resolve(); };
-      const failed = () => { clean(); reject(new Error(source)); };
-      image.addEventListener("load", loaded, { once: true });
-      image.addEventListener("error", failed, { once: true });
-      image.src = source;
-      if (image.complete && image.naturalWidth) loaded();
+
+        const clean = () => {
+            image.removeEventListener("load", loaded);
+            image.removeEventListener("error", failed);
+        };
+
+        const loaded = () => {
+
+            let dbg = document.getElementById("atlas-debug");
+
+            if (!dbg) {
+                dbg = document.createElement("div");
+                dbg.id = "atlas-debug";
+
+                dbg.style.position = "fixed";
+                dbg.style.top = "10px";
+                dbg.style.left = "10px";
+                dbg.style.zIndex = "999999";
+                dbg.style.background = "rgba(0,0,0,.8)";
+                dbg.style.color = "white";
+                dbg.style.padding = "10px";
+                dbg.style.fontSize = "12px";
+                dbg.style.fontFamily = "monospace";
+            }
+
+            dbg.innerHTML = `
+                IMG: ${image.naturalWidth} × ${image.naturalHeight}<br>
+                WIN: ${window.innerWidth} × ${window.innerHeight}<br>
+                VIS: ${window.visualViewport?.width} × ${window.visualViewport?.height}
+            `;
+
+            document.body.appendChild(dbg);
+
+            clean();
+            resolve();
+        };
+
+        const failed = () => {
+            clean();
+            reject(new Error(source));
+        };
+
+        image.addEventListener("load", loaded, { once: true });
+        image.addEventListener("error", failed, { once: true });
+
+        image.src = source;
+
+        if (image.complete && image.naturalWidth)
+            loaded();
     });
-  }
+}
 
   async function renderVideo(page, token) {
     ui.primary.style.display = "none";
