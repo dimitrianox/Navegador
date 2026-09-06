@@ -42,7 +42,7 @@ body {
   filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.8));
 }
 
-/* DIVISOR DEL AÑO CON LÍNEAS DE GRADIENTE A LOS LADOS */
+/* DIVISOR DEL AÑO */
 .divider-year {
   width: 100%;
   max-width: 450px;
@@ -91,7 +91,7 @@ body {
   justify-content: center;
 }
 
-/* GRILLA MASONRY DE LA GALERÍA CON MARCOS DORADOS */
+/* GRILLA MASONRY DE LA GALERÍA */
 main {
   max-width: 800px;
   width: 90vw;
@@ -146,7 +146,9 @@ main a:hover video {
   transform: scale(1.02);
 }
 
-/* MODAL OVERLAY CORREGIDO SIN SCROLL */
+/* =========================================================
+   MODAL PANTALLA COMPLETA (MAXIMIZADO Y PROPORCIONADO)
+   ========================================================= */
 div.modal {
   position: fixed;
   top: 0;
@@ -156,13 +158,13 @@ div.modal {
   display: flex;
   justify-content: center;
   align-items: center;
-  background: rgba(7, 14, 23, 0.95);
-  backdrop-filter: blur(8px);
+  background: rgba(7, 14, 23, 0.96);
+  backdrop-filter: blur(10px);
   transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
   opacity: 0;
   visibility: hidden;
   z-index: 1000;
-  padding: 12px;
+  padding: 8px;
   overflow: hidden !important;
   touch-action: none;
 }
@@ -176,19 +178,18 @@ div.modal.overlay {
   position: relative;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  align-items: center;
   width: 100%;
-  max-width: 600px;
+  max-width: 800px;
   height: 100%;
-  max-height: calc(100dvh - 24px);
+  max-height: calc(100dvh - 16px);
   z-index: 5;
   overflow: hidden;
 }
 
+/* ENCABEZADO MINIMALISTA SUPERIOR */
 .editorial-header {
   width: 100%;
-  padding: 8px 0;
+  padding: 6px 4px 10px 4px;
   display: flex;
   flex-direction: row;
   justify-content: space-between;
@@ -198,7 +199,7 @@ div.modal.overlay {
 }
 
 #info-ubicacion {
-  font-size: 0.8rem;
+  font-size: 0.82rem;
   text-transform: uppercase;
   letter-spacing: 1.5px;
   color: #d4af37;
@@ -217,15 +218,16 @@ div.modal.overlay {
   white-space: nowrap;
 }
 
+/* CONTENEDOR DE LA IMAGEN EXPANDIDO AL MÁXIMO */
 .modal-media-wrapper {
   position: relative;
   flex: 1 1 auto;
   width: 100%;
+  height: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
   min-height: 0;
-  padding: 4px 0;
   overflow: hidden;
 }
 
@@ -236,9 +238,9 @@ div.modal video {
   width: auto;
   height: auto;
   object-fit: contain;
-  border-radius: 4px;
-  border: 2px solid #b89146;
-  box-shadow: 0 0 15px rgba(0, 0, 0, 0.6);
+  border-radius: 6px;
+  border: 1.5px solid #b89146;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.8);
 }
 
 div.modal img {
@@ -254,29 +256,30 @@ div.modal img:active {
   cursor: grabbing;
 }
 
-/* SUPERPOSICIÓN FLOTANTE SOBRE LA FOTO/VIDEO */
+/* CUADRO DE DESCRIPCIÓN SOBRE LA IMAGEN (CASI TRANSPARENTE) */
 .description-overlay {
   position: absolute;
-  bottom: 12px;
+  bottom: 20px;
   left: 50%;
   transform: translateX(-50%);
-  width: 90%;
-  max-width: 500px;
-  background: rgba(7, 14, 23, 0.88);
-  backdrop-filter: blur(6px);
-  border: 1px solid #b89146;
+  width: 88%;
+  max-width: 520px;
+  background: rgba(7, 14, 23, 0.75); /* Fondo casi transparente */
+  backdrop-filter: blur(8px);       /* Efecto cristal translúcido */
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(184, 145, 70, 0.6);
   border-radius: 8px;
   color: #f8fafc;
   font-family: 'Manrope', sans-serif;
   font-size: 0.85rem;
-  line-height: 1.4;
-  padding: 10px 14px;
+  line-height: 1.45;
+  padding: 12px 16px;
   text-align: center;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.7);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.8);
   pointer-events: none;
   opacity: 0;
   visibility: hidden;
-  transition: opacity 0.2s ease, visibility 0.2s ease;
+  transition: opacity 0.25s ease, visibility 0.25s ease;
   z-index: 20;
 }
 
@@ -285,9 +288,10 @@ div.modal img:active {
   visibility: visible;
 }
 
+/* TÍTULO INFERIOR COMPACTO */
 .editorial-footer {
   width: 100%;
-  padding: 8px 0;
+  padding: 8px 0 4px 0;
   text-align: center;
   pointer-events: none;
   flex-shrink: 0;
@@ -296,7 +300,7 @@ div.modal img:active {
 #info-titulo {
   margin: 0;
   font-family: 'Cormorant Garamond', serif;
-  font-size: 1.35rem;
+  font-size: 1.25rem;
   font-weight: 600;
   color: #f8fafc;
   letter-spacing: 0.5px;
@@ -305,7 +309,6 @@ div.modal img:active {
   text-overflow: ellipsis;
 }
 
-/* Se oculta del pie para dar espacio al título */
 #info-descripcion {
   display: none !important;
 }
