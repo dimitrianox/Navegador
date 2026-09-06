@@ -16,6 +16,7 @@ const infoUbicacion = document.getElementById('info-ubicacion');
 const infoFecha = document.getElementById('info-fecha');
 const infoTitulo = document.getElementById('info-titulo');
 const infoDescripcion = document.getElementById('info-descripcion');
+const descOverlay = document.getElementById('description-overlay');
 
 const clasesTamano = ['', '', 'span-col-2', 'span-row-2', 'span-big'];
 
@@ -28,6 +29,10 @@ let posY = 0;
 let startX = 0;
 let startY = 0;
 let isDragging = false;
+
+// Variables para detección de pulsación sostenida (Hold)
+let pressTimer = null;
+let isPressing = false;
 
 // Deshabilitar menú contextual
 document.addEventListener('contextmenu', function(e) {
@@ -59,7 +64,6 @@ function formatearFecha(fechaOriginal) {
   if (partes.length === 3) {
     let dia, mes, anio;
 
-    // Detectar si la cadena empieza por AÑO ("2025/05/25") o por DÍA ("25/05/2025")
     if (partes[0].length === 4) {
       [anio, mes, dia] = partes;
     } else {
@@ -104,7 +108,35 @@ function cerrarModal() {
   modalVideo.removeAttribute('src');
   modalVideo.load();
   modalImg.src = '';
+  ocultarOverlayDesc();
   resetZoom();
+}
+
+// --- FUNCIONES Y EVENTOS DE DESCRIPCIÓN AL MANTENER PRESIONADO ---
+function mostrarOverlayDesc() {
+  const texto = infoDescripcion.textContent.trim();
+  if (texto) {
+    descOverlay.textContent = texto;
+    descOverlay.classList.add('active');
+  }
+}
+
+function ocultarOverlayDesc() {
+  descOverlay.classList.remove('active');
+}
+
+function iniciarPulsacion() {
+  isPressing = false;
+  clearTimeout(pressTimer);
+  pressTimer = setTimeout(() => {
+    isPressing = true;
+    mostrarOverlayDesc();
+  }, 280);
+}
+
+function cancelarPulsacion() {
+  clearTimeout(pressTimer);
+  ocultarOverlayDesc();
 }
 
 // --- CARGA Y RENDERIZADO DE DATOS (FETCH) ---
@@ -226,13 +258,7 @@ function inicializarEventos() {
       infoTitulo.textContent = anchor.dataset.titulo;
 
       const desc = anchor.dataset.descripcion;
-      if (desc) {
-        infoDescripcion.textContent = desc;
-        infoDescripcion.style.display = 'block';
-      } else {
-        infoDescripcion.textContent = '';
-        infoDescripcion.style.display = 'none';
-      }
+      infoDescripcion.textContent = desc || '';
 
       if (esVid) {
         modalImg.style.display = 'none';
@@ -258,7 +284,7 @@ function inicializarEventos() {
   });
 }
 
-// --- GESTOS PINCH-TO-ZOOM Y ARRASTRE EN LA IMAGEN DEL MODAL ---
+// --- CONTROL DE GESTOS MOUSE / TÁCTIL EN IMAGEN DEL MODAL ---
 function getDistance(touches) {
   return Math.hypot(
     touches[0].clientX - touches[1].clientX,
@@ -266,18 +292,29 @@ function getDistance(touches) {
   );
 }
 
+// Eventos para detectar pulsación sostenida
+modalImg.addEventListener('mousedown', iniciarPulsacion);
+modalImg.addEventListener('mouseup', cancelarPulsacion);
+modalImg.addEventListener('mouseleave', cancelarPulsacion);
+
 modalImg.addEventListener('touchstart', (e) => {
   if (e.touches.length === 2) {
+    cancelarPulsacion();
     startDistance = getDistance(e.touches);
-  } else if (e.touches.length === 1 && scale > 1) {
-    isDragging = true;
-    startX = e.touches[0].clientX - posX;
-    startY = e.touches[0].clientY - posY;
+  } else if (e.touches.length === 1) {
+    if (scale > 1) {
+      isDragging = true;
+      startX = e.touches[0].clientX - posX;
+      startY = e.touches[0].clientY - posY;
+    } else {
+      iniciarPulsacion();
+    }
   }
 });
 
 modalImg.addEventListener('touchmove', (e) => {
   if (e.touches.length === 2) {
+    cancelarPulsacion();
     e.preventDefault();
     const currentDistance = getDistance(e.touches);
     if (startDistance > 0) {
@@ -285,6 +322,7 @@ modalImg.addEventListener('touchmove', (e) => {
       modalImg.style.transform = `translate(${posX}px, ${posY}px) scale(${scale})`;
     }
   } else if (e.touches.length === 1 && isDragging && scale > 1) {
+    cancelarPulsacion();
     e.preventDefault();
     posX = e.touches[0].clientX - startX;
     posY = e.touches[0].clientY - startY;
@@ -293,6 +331,7 @@ modalImg.addEventListener('touchmove', (e) => {
 });
 
 modalImg.addEventListener('touchend', (e) => {
+  cancelarPulsacion();
   if (e.touches.length < 2) {
     lastScale = scale;
   }
@@ -304,8 +343,16 @@ modalImg.addEventListener('touchend', (e) => {
   }
 });
 
+modalImg.addEventListener('touchcancel', cancelarPulsacion);
+
 modalImg.addEventListener('click', (e) => {
   e.stopPropagation();
+  // Evita cerrar o resetear si fue una pulsación sostenida para leer la descripción
+  if (isPressing) {
+    isPressing = false;
+    return;
+  }
+
   if (scale > 1) {
     resetZoom();
   } else {
