@@ -147,7 +147,7 @@ main a:hover video {
 }
 
 /* =========================================================
-   MODAL - OPCIÓN A: MARCO INTEGRADO Y COMPACTO
+   MODAL - DISTRIBUCIÓN PANTALLA COMPLETA BALANCEADA
    ========================================================= */
 div.modal {
   position: fixed;
@@ -157,14 +157,14 @@ div.modal {
   height: 100dvh;
   display: flex;
   justify-content: center;
-  align-items: center; /* Centra todo el bloque unificado en la pantalla */
+  align-items: center;
   background: rgba(7, 14, 23, 0.96);
   backdrop-filter: blur(10px);
   transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
   opacity: 0;
   visibility: hidden;
   z-index: 1000;
-  padding: 16px;
+  padding: 16px 12px;
   overflow: hidden !important;
   touch-action: none;
 }
@@ -174,25 +174,25 @@ div.modal.overlay {
   visibility: visible;
 }
 
-/* Contenedor compacto que se ajusta a la foto */
+/* Ocupa el 100% de la altura y distribuye arriba, centro y abajo */
 .modal-content {
   position: relative;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
-  width: auto;
-  max-width: 100%;
-  height: auto;
-  max-height: 100%;
+  width: 100%;
+  max-width: 800px;
+  height: 100%;
+  max-height: calc(100dvh - 32px);
   z-index: 5;
   overflow: hidden;
 }
 
-/* ENCABEZADO APEGADO AL BORDE SUPERIOR DE LA FOTO */
+/* ENCABEZADO SUPERIOR CON MARGEN PROPORCIONAL */
 .editorial-header {
   width: 100%;
-  padding: 0 4px 8px 4px; /* Margen ajustado justo arriba del marco */
+  padding: 8px 4px 16px 4px;
   display: flex;
   flex-direction: row;
   justify-content: space-between;
@@ -228,28 +228,28 @@ div.modal.overlay {
   display: inline-block;
 }
 
-/* CONTENEDOR DE LA IMAGEN EN SU TAMAÑO PROPORCIONAL */
+/* CONTENEDOR CENTRAL: CENTRA LA IMAGEN EN EL ESPACIO RESTANTE */
 .modal-media-wrapper {
   position: relative;
-  flex: 0 1 auto; /* Evita que el contenedor estire espacio innecesario */
+  flex: 1 1 auto;
+  width: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
-  max-width: 100%;
-  max-height: calc(100dvh - 110px); /* Reserva exactos los píxeles de los textos */
+  min-height: 0;
   overflow: hidden;
 }
 
 div.modal img,
 div.modal video {
-  max-height: calc(100dvh - 110px);
+  max-height: 100%;
   max-width: 100%;
   width: auto;
   height: auto;
   object-fit: contain;
   border-radius: 6px;
   border: 1.5px solid #b89146;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.8);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.8);
 }
 
 div.modal img {
@@ -265,7 +265,7 @@ div.modal img:active {
   cursor: grabbing;
 }
 
-/* CUADRO DE DESCRIPCIÓN SOBRE LA IMAGEN (CASI TRANSPARENTE) */
+/* CUADRO DE DESCRIPCIÓN SOBRE LA IMAGEN (TRANSLÚCIDO) */
 .description-overlay {
   position: absolute;
   bottom: 20px;
@@ -297,10 +297,10 @@ div.modal img:active {
   visibility: visible;
 }
 
-/* TÍTULO APEGADO AL BORDE INFERIOR DE LA FOTO */
+/* TÍTULO INFERIOR CON ESPACIO DE RESPIRACIÓN */
 .editorial-footer {
   width: 100%;
-  padding: 8px 0 0 0; /* Margen ajustado justo debajo del marco */
+  padding: 16px 0 8px 0;
   text-align: center;
   pointer-events: none;
   flex-shrink: 0;
@@ -309,7 +309,7 @@ div.modal img:active {
 #info-titulo {
   margin: 0;
   font-family: 'Cormorant Garamond', serif;
-  font-size: 1.25rem;
+  font-size: 1.3rem;
   font-weight: 600;
   color: #f8fafc;
   letter-spacing: 0.5px;
