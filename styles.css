@@ -316,7 +316,7 @@ div.modal img:active {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-transform: translateY(-15px); /* <--- AÑADE ESTA LÍNEA AQUÍ */
+transform: translateY(-25px); /* <--- AÑADE ESTA LÍNEA AQUÍ */
 }
 
 #info-descripcion {
