@@ -147,7 +147,7 @@ main a:hover video {
 }
 
 /* =========================================================
-   MODAL - BLOQUE COMPACTO COHESIONADO
+   MODAL - PANTALLA COMPLETA CON TEXTOS ENMARCADOS
    ========================================================= */
 div.modal {
   position: fixed;
@@ -164,7 +164,7 @@ div.modal {
   opacity: 0;
   visibility: hidden;
   z-index: 1000;
-  padding: 16px 12px;
+  padding: 12px;
   overflow: hidden !important;
   touch-action: none;
 }
@@ -174,35 +174,70 @@ div.modal.overlay {
   visibility: visible;
 }
 
-/* El contenido mide ÚNICAMENTE lo que miden sus 3 bloques juntos */
 .modal-content {
   position: relative;
   display: flex;
-  flex-direction: column;
   justify-content: center;
   align-items: center;
   width: 100%;
   max-width: 800px;
-  height: fit-content !important; /* Elimina espacio vacío en los extremos */
+  height: 100%;
   max-height: calc(100dvh - 24px);
   z-index: 5;
   overflow: hidden;
-  margin: auto;
 }
 
-/* BLOQUE 1 (VERDE): UBICACIÓN Y FECHA ARRIBA DEL BORDE SUPERIOR DE LA FOTO */
-.editorial-header {
+/* MARCO CONTENEDOR PRINCIPAL */
+.modal-media-wrapper {
+  position: relative;
   width: 100%;
-  padding: 0 4px;
-  margin-bottom: 8px; /* Distancia constante respecto al borde dorado superior */
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+}
+
+div.modal img,
+div.modal video {
+  max-height: 100%;
+  max-width: 100%;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  border-radius: 6px;
+  border: 1.5px solid #b89146;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.8);
+}
+
+div.modal img {
+  cursor: grab;
+  pointer-events: auto;
+  touch-action: none;
+  transform-origin: center center;
+  transition: transform 0.05s linear;
+  will-change: transform;
+}
+
+div.modal img:active {
+  cursor: grabbing;
+}
+
+/* ENCABEZADO DENTRO DEL LÍMITE SUPERIOR DE LA MEDIA */
+.editorial-header {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 90%;
   display: flex;
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
   pointer-events: none;
-  flex-shrink: 0;
   gap: 12px;
   z-index: 10;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.9), 0 0 8px rgba(0, 0, 0, 0.8);
 }
 
 #info-ubicacion {
@@ -222,7 +257,7 @@ div.modal.overlay {
 #info-fecha {
   font-size: 0.78rem;
   letter-spacing: 1px;
-  color: #94a3b8;
+  color: #f8fafc;
   font-weight: 500;
   white-space: nowrap;
   flex-shrink: 0;
@@ -230,50 +265,10 @@ div.modal.overlay {
   display: inline-block;
 }
 
-/* BLOQUE 2 (AMARILLO): MARCO AJUSTADO EXACTO A LA FOTO */
-.modal-media-wrapper {
-  position: relative;
-  flex: 0 1 auto;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: fit-content;
-  height: fit-content;
-  max-width: 100%;
-  max-height: calc(100dvh - 100px);
-  overflow: hidden;
-}
-
-div.modal img,
-div.modal video {
-  max-height: calc(100dvh - 100px);
-  max-width: 100%;
-  width: auto;
-  height: auto;
-  object-fit: contain;
-  border-radius: 6px;
-  border: 1.5px solid #b89146;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.8);
-  display: block;
-}
-
-div.modal img {
-  cursor: grab;
-  pointer-events: auto;
-  touch-action: none;
-  transform-origin: center center;
-  transition: transform 0.05s linear;
-  will-change: transform;
-}
-
-div.modal img:active {
-  cursor: grabbing;
-}
-
-/* CUADRO DE DESCRIPCIÓN EMERGENTE (HOLD) */
+/* CUADRO DE DESCRIPCIÓN SOBRE LA IMAGEN (TRANSLÚCIDO) */
 .description-overlay {
   position: absolute;
-  bottom: 20px;
+  bottom: 45px;
   left: 50%;
   transform: translateX(-50%);
   width: 88%;
@@ -302,14 +297,17 @@ div.modal img:active {
   visibility: visible;
 }
 
-/* BLOQUE 3 (ROJO): TÍTULO PEGADO DEBAJO DEL BORDE INFERIOR DE LA FOTO */
+/* TÍTULO DENTRO DEL LÍMITE INFERIOR DE LA MEDIA */
 .editorial-footer {
-  width: 100%;
-  padding: 0;
-  margin-top: 50; /* Distancia fija corta de 12px respecto a la foto */
+  position: absolute;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 90%;
   text-align: center;
   pointer-events: none;
-  flex-shrink: 0;
+  z-index: 10;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.9), 0 0 8px rgba(0, 0, 0, 0.8);
 }
 
 #info-titulo {
