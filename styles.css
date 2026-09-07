@@ -201,7 +201,7 @@ div.modal.overlay {
   flex-shrink: 0;
   gap: 12px;
   z-index: 10;
-transform: translateY(50px); /* <--- AÑADE ESTA LÍNEA */
+transform: translateY(40px); /* <--- AÑADE ESTA LÍNEA */
 }
 
 #info-ubicacion {
