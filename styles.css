@@ -147,7 +147,7 @@ main a:hover video {
 }
 
 /* =========================================================
-   MODAL - 3 BLOQUES INDEPENDIENTES CON DISTANCIA CONSTANTE
+   MODAL - APROVECHAMIENTO OPTIMIZADO DE PANTALLA
    ========================================================= */
 div.modal {
   position: fixed;
@@ -157,7 +157,7 @@ div.modal {
   height: 100dvh;
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: flex-start; /* Elimina la franja negra superior empujando el contenido al inicio natural */
   background: rgba(7, 14, 23, 0.96);
   backdrop-filter: blur(10px);
   transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
@@ -174,26 +174,27 @@ div.modal.overlay {
   visibility: visible;
 }
 
-/* El modal agrupa los 3 bloques armónicamente en el centro de la pantalla */
+/* Contenedor compacto que ajusta su altura exacta al contenido */
 .modal-content {
   position: relative;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-start;
   align-items: center;
   width: 100%;
   max-width: 800px;
   height: auto;
-  max-height: calc(100dvh - 32px);
+  max-height: 100dvh;
   z-index: 5;
   overflow: hidden;
+  margin-top: auto;
+  margin-bottom: auto; /* Centra el conjunto completo eliminando aire sobrante */
 }
 
 /* BLOQUE 1 (VERDE): ENCABEZADO SUPERIOR */
 .editorial-header {
   width: 100%;
-  padding: 0 4px;
-  margin-bottom: 12px; /* Margen constante sobre el bloque 2 */
+  padding: 0 4px 8px 4px;
   display: flex;
   flex-direction: row;
   justify-content: space-between;
@@ -229,7 +230,7 @@ div.modal.overlay {
   display: inline-block;
 }
 
-/* BLOQUE 2 (AMARILLO): MARCO AJUSTADO EXACTO A LA FOTO (RECEPTOR DEL ZOOM) */
+/* BLOQUE 2 (AMARILLO): MARCO DE IMAGEN MAXIMIZADO */
 .modal-media-wrapper {
   position: relative;
   flex: 0 1 auto;
@@ -239,13 +240,13 @@ div.modal.overlay {
   width: fit-content;
   height: fit-content;
   max-width: 100%;
-  max-height: calc(100dvh - 120px);
-  overflow: hidden; /* El zoom y desplazamiento no salen de este contenedor */
+  max-height: calc(100dvh - 80px); /* Límite ampliado para ocupar máximo espacio vertical */
+  overflow: hidden;
 }
 
 div.modal img,
 div.modal video {
-  max-height: calc(100dvh - 120px);
+  max-height: calc(100dvh - 80px);
   max-width: 100%;
   width: auto;
   height: auto;
@@ -301,11 +302,11 @@ div.modal img:active {
   visibility: visible;
 }
 
-/* BLOQUE 3 (ROJO): TÍTULO A DISTANCIA FIJA EXACTA DE LA IMAGEN (16PX) */
+/* BLOQUE 3 (ROJO): TÍTULO A DISTANCIA FIJA EXACTA (12PX) */
 .editorial-footer {
   width: 100%;
   padding: 0;
-  margin-top: 16px; /* DISTANCIA FIJA CONSTANTE DESDE EL MARCO DERECHO/INFERIOR DE CUALQUIER FOTO */
+  margin-top: 12px; /* Distancia constante corta respecto al marco inferior de la foto */
   text-align: center;
   pointer-events: none;
   flex-shrink: 0;
