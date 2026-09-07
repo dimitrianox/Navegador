@@ -306,7 +306,7 @@ div.modal img:active {
 .editorial-footer {
   width: 100%;
   padding: 0;
-  margin-top: 12px; /* Distancia fija corta de 12px respecto a la foto */
+  margin-top: 50; /* Distancia fija corta de 12px respecto a la foto */
   text-align: center;
   pointer-events: none;
   flex-shrink: 0;
