@@ -13,7 +13,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,400&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=3">
+  <link rel="stylesheet" href="styles.css?v=5">
 </head>
 <body>
 
@@ -37,28 +37,31 @@
     </div>
   </footer>
 
-  <!-- Modal -->
+  <!-- Modal (3 Bloques independientes) -->
   <div class="modal">
     <div class="modal-content">
-      <div class="modal-media-wrapper">
-        <!-- Encabezado superior dentro de la caja de la media -->
-        <div class="editorial-header">
-          <span id="info-ubicacion"></span>
-          <span id="info-fecha"></span>
-        </div>
+      
+      <!-- BLOQUE 1: Ubicación y Fecha -->
+      <div class="editorial-header">
+        <span id="info-ubicacion"></span>
+        <span id="info-fecha"></span>
+      </div>
 
+      <!-- BLOQUE 2: La Imagen -->
+      <div class="modal-media-wrapper">
         <img src="" alt="" id="modal-img" style="display: none;" referrerpolicy="no-referrer" />
         <video id="modal-video" controls style="display: none;" playsinline referrerpolicy="no-referrer"></video>
         
         <!-- Capa superpuesta para la descripción al mantener presionado -->
         <div id="description-overlay" class="description-overlay"></div>
-
-        <!-- Título inferior dentro de la caja de la media -->
-        <div class="editorial-footer">
-          <h3 id="info-titulo"></h3>
-          <p id="info-descripcion"></p>
-        </div>
       </div>
+
+      <!-- BLOQUE 3: Título de la fotografía -->
+      <div class="editorial-footer">
+        <h3 id="info-titulo"></h3>
+        <p id="info-descripcion"></p>
+      </div>
+
     </div>
   </div>
 
