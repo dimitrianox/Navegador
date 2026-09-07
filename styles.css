@@ -201,6 +201,7 @@ div.modal.overlay {
   flex-shrink: 0;
   gap: 12px;
   z-index: 10;
+transform: translateY(50px); /* <--- AÑADE ESTA LÍNEA */
 }
 
 #info-ubicacion {
@@ -316,7 +317,7 @@ div.modal img:active {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-transform: translateY(-35px); /* <--- AÑADE ESTA LÍNEA AQUÍ */
+transform: translateY(-30px); /* <--- AÑADE ESTA LÍNEA AQUÍ */
 }
 
 #info-descripcion {
