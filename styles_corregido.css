@@ -147,7 +147,7 @@ main a:hover video {
 }
 
 /* =========================================================
-   MODAL - 3 BLOQUES INDEPENDIENTES CON DISTANCIA CONSTANTE
+   MODAL - TRES BLOQUES CON DISTANCIA FIJA
    ========================================================= */
 div.modal {
   position: fixed;
@@ -164,7 +164,7 @@ div.modal {
   opacity: 0;
   visibility: hidden;
   z-index: 1000;
-  padding: 16px 12px;
+  padding: 12px;
   overflow: hidden !important;
   touch-action: none;
 }
@@ -174,7 +174,7 @@ div.modal.overlay {
   visibility: visible;
 }
 
-/* El modal agrupa los 3 bloques armónicamente en el centro de la pantalla */
+/* El contenido agrupa los 3 bloques en el centro vertical */
 .modal-content {
   position: relative;
   display: flex;
@@ -184,16 +184,16 @@ div.modal.overlay {
   width: 100%;
   max-width: 800px;
   height: auto;
-  max-height: calc(100dvh - 32px);
+  max-height: calc(100dvh - 24px);
   z-index: 5;
   overflow: hidden;
 }
 
-/* BLOQUE 1 (VERDE): ENCABEZADO SUPERIOR */
+/* BLOQUE 1: ENCABEZADO SUPERIOR INDEPENDIENTE */
 .editorial-header {
   width: 100%;
   padding: 0 4px;
-  margin-bottom: 12px; /* Margen constante sobre el bloque 2 */
+  margin-bottom: 10px;
   display: flex;
   flex-direction: row;
   justify-content: space-between;
@@ -229,23 +229,22 @@ div.modal.overlay {
   display: inline-block;
 }
 
-/* BLOQUE 2 (AMARILLO): MARCO AJUSTADO EXACTO A LA FOTO (RECEPTOR DEL ZOOM) */
+/* BLOQUE 2: CONTENEDOR DE LA IMAGEN (Ceñido a su alto real) */
 .modal-media-wrapper {
   position: relative;
   flex: 0 1 auto;
+  width: auto;
+  max-width: 100%;
+  max-height: calc(100dvh - 100px);
   display: flex;
   justify-content: center;
   align-items: center;
-  width: fit-content;
-  height: fit-content;
-  max-width: 100%;
-  max-height: calc(100dvh - 120px);
-  overflow: hidden; /* El zoom y desplazamiento no salen de este contenedor */
+  overflow: hidden;
 }
 
 div.modal img,
 div.modal video {
-  max-height: calc(100dvh - 120px);
+  max-height: calc(100dvh - 100px);
   max-width: 100%;
   width: auto;
   height: auto;
@@ -253,7 +252,6 @@ div.modal video {
   border-radius: 6px;
   border: 1.5px solid #b89146;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.8);
-  display: block;
 }
 
 div.modal img {
@@ -269,7 +267,7 @@ div.modal img:active {
   cursor: grabbing;
 }
 
-/* CUADRO DE DESCRIPCIÓN EMERGENTE (HOLD) */
+/* CUADRO DE DESCRIPCIÓN EMERGENTE SOBRE LA IMAGEN */
 .description-overlay {
   position: absolute;
   bottom: 20px;
@@ -301,11 +299,11 @@ div.modal img:active {
   visibility: visible;
 }
 
-/* BLOQUE 3 (ROJO): TÍTULO A DISTANCIA FIJA EXACTA DE LA IMAGEN (16PX) */
+/* BLOQUE 3: TÍTULO DE LA FOTOGRAFÍA (DISTANCIA FIJA CONSTANTE) */
 .editorial-footer {
   width: 100%;
   padding: 0;
-  margin-top: 16px; /* DISTANCIA FIJA CONSTANTE DESDE EL MARCO DERECHO/INFERIOR DE CUALQUIER FOTO */
+  margin-top: 28px;
   text-align: center;
   pointer-events: none;
   flex-shrink: 0;
@@ -318,9 +316,12 @@ div.modal img:active {
   font-weight: 600;
   color: #f8fafc;
   letter-spacing: 0.5px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  white-space: normal;
+  overflow: visible;
+  text-overflow: unset;
+  line-height: 1.15;
+  max-width: 95%;
+  margin-inline: auto;
 }
 
 #info-descripcion {
