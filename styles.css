@@ -147,7 +147,7 @@ main a:hover video {
 }
 
 /* =========================================================
-   MODAL - DISTRIBUCIÓN PANTALLA COMPLETA BALANCEADA
+   MODAL - PANTALLA COMPLETA CON TEXTOS ENMARCADOS
    ========================================================= */
 div.modal {
   position: fixed;
@@ -164,7 +164,7 @@ div.modal {
   opacity: 0;
   visibility: hidden;
   z-index: 1000;
-  padding: 16px 12px;
+  padding: 12px;
   overflow: hidden !important;
   touch-action: none;
 }
@@ -174,70 +174,27 @@ div.modal.overlay {
   visibility: visible;
 }
 
-/* Ocupa el 100% de la altura y distribuye arriba, centro y abajo */
 .modal-content {
   position: relative;
   display: flex;
-  flex-direction: column;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
   width: 100%;
   max-width: 800px;
   height: 100%;
-  max-height: calc(100dvh - 32px);
+  max-height: calc(100dvh - 24px);
   z-index: 5;
   overflow: hidden;
 }
 
-/* ENCABEZADO SUPERIOR CON MARGEN PROPORCIONAL */
-.editorial-header {
-  width: 100%;
-  padding: 8px 4px 16px 4px;
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
-  pointer-events: none;
-  flex-shrink: 0;
-  gap: 12px;
-  z-index: 10;
-transform: translateY(40px); /* <--- AÑADE ESTA LÍNEA */
-}
-
-#info-ubicacion {
-  font-size: 0.82rem;
-  text-transform: uppercase;
-  letter-spacing: 1.5px;
-  color: #d4af37;
-  font-weight: 700;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  flex: 1;
-  min-width: 0;
-  display: inline-block;
-}
-
-#info-fecha {
-  font-size: 0.78rem;
-  letter-spacing: 1px;
-  color: #94a3b8;
-  font-weight: 500;
-  white-space: nowrap;
-  flex-shrink: 0;
-  text-align: right;
-  display: inline-block;
-}
-
-/* CONTENEDOR CENTRAL: CENTRA LA IMAGEN EN EL ESPACIO RESTANTE */
+/* MARCO CONTENEDOR PRINCIPAL */
 .modal-media-wrapper {
   position: relative;
-  flex: 1 1 auto;
   width: 100%;
+  height: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 0;
   overflow: hidden;
 }
 
@@ -266,15 +223,57 @@ div.modal img:active {
   cursor: grabbing;
 }
 
+/* ENCABEZADO DENTRO DEL LÍMITE SUPERIOR DE LA MEDIA */
+.editorial-header {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 90%;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  pointer-events: none;
+  gap: 12px;
+  z-index: 10;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.9), 0 0 8px rgba(0, 0, 0, 0.8);
+}
+
+#info-ubicacion {
+  font-size: 0.82rem;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: #d4af37;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1;
+  min-width: 0;
+  display: inline-block;
+}
+
+#info-fecha {
+  font-size: 0.78rem;
+  letter-spacing: 1px;
+  color: #f8fafc;
+  font-weight: 500;
+  white-space: nowrap;
+  flex-shrink: 0;
+  text-align: right;
+  display: inline-block;
+}
+
 /* CUADRO DE DESCRIPCIÓN SOBRE LA IMAGEN (TRANSLÚCIDO) */
 .description-overlay {
   position: absolute;
-  bottom: 20px;
+  bottom: 45px;
   left: 50%;
   transform: translateX(-50%);
   width: 88%;
   max-width: 520px;
-  background: rgba(7, 14, 23, 0.75);
+  background: rgba(7, 14, 23, 0.85);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   border: 1px solid rgba(184, 145, 70, 0.6);
@@ -298,13 +297,17 @@ div.modal img:active {
   visibility: visible;
 }
 
-/* TÍTULO INFERIOR CON ESPACIO DE RESPIRACIÓN */
+/* TÍTULO DENTRO DEL LÍMITE INFERIOR DE LA MEDIA */
 .editorial-footer {
-  width: 100%;
-  padding: 16px 0 8px 0;
+  position: absolute;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 90%;
   text-align: center;
   pointer-events: none;
-  flex-shrink: 0;
+  z-index: 10;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.9), 0 0 8px rgba(0, 0, 0, 0.8);
 }
 
 #info-titulo {
@@ -317,7 +320,6 @@ div.modal img:active {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-transform: translateY(-30px); /* <--- AÑADE ESTA LÍNEA AQUÍ */
 }
 
 #info-descripcion {
