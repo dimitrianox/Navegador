@@ -320,6 +320,7 @@ div.modal img:active {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+transform: translateY(-50; /* <--- AÑADE ESTA LÍNEA AQUÍ */
 }
 
 #info-descripcion {
