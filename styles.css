@@ -300,7 +300,7 @@ div.modal img:active {
 /* TÍTULO DENTRO DEL LÍMITE INFERIOR DE LA MEDIA */
 .editorial-footer {
   position: absolute;
-  bottom: 10px;
+  bottom: 25px;
   left: 50%;
   transform: translateX(-50%);
   width: 90%;
