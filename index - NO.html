@@ -40,25 +40,24 @@
   <!-- Modal -->
   <div class="modal">
     <div class="modal-content">
-      <!-- Encabezado superior -->
-      <div class="editorial-header">
-        <span id="info-ubicacion"></span>
-        <span id="info-fecha"></span>
-      </div>
-
-      <!-- Contenedor de imagen/video e overlay de descripción -->
       <div class="modal-media-wrapper">
+        <!-- Encabezado superior dentro de la caja de la media -->
+        <div class="editorial-header">
+          <span id="info-ubicacion"></span>
+          <span id="info-fecha"></span>
+        </div>
+
         <img src="" alt="" id="modal-img" style="display: none;" referrerpolicy="no-referrer" />
         <video id="modal-video" controls style="display: none;" playsinline referrerpolicy="no-referrer"></video>
         
         <!-- Capa superpuesta para la descripción al mantener presionado -->
         <div id="description-overlay" class="description-overlay"></div>
-      </div>
 
-      <!-- Título inferior -->
-      <div class="editorial-footer">
-        <h3 id="info-titulo"></h3>
-        <p id="info-descripcion"></p>
+        <!-- Título inferior dentro de la caja de la media -->
+        <div class="editorial-footer">
+          <h3 id="info-titulo"></h3>
+          <p id="info-descripcion"></p>
+        </div>
       </div>
     </div>
   </div>
