@@ -34,22 +34,24 @@ let isDragging = false;
 let pressTimer = null;
 let isPressing = false;
 
-// --- DESHABILITAR MENÚ CONTEXTUAL EN ANDROID Y iOS (FASE DE CAPTURA) ---
-function bloquearMenuContextual(e) {
+// --- DESHABILITAR MENÚ CONTEXTUAL ABSOLUTO EN ANDROID Y iOS ---
+function bloquearAccionNativa(e) {
   if (
     e.target.tagName === 'IMG' || 
     e.target.tagName === 'VIDEO' || 
     e.target.closest('.modal') || 
     e.target.closest('#galeria')
   ) {
-    e.preventDefault();
+    if (e.cancelable) e.preventDefault();
     e.stopPropagation();
     return false;
   }
 }
 
-window.addEventListener('contextmenu', bloquearMenuContextual, true);
-document.addEventListener('contextmenu', bloquearMenuContextual, true);
+['contextmenu', 'selectstart', 'dragstart'].forEach(evento => {
+  window.addEventListener(evento, bloquearAccionNativa, { capture: true, passive: false });
+  document.addEventListener(evento, bloquearAccionNativa, { capture: true, passive: false });
+});
 
 function esVideo(url, tipo) {
   if (tipo === 'video') return true;
@@ -64,7 +66,7 @@ function resolverRuta(url) {
   return rutaCarpeta + url;
 }
 
-// --- FUNCIÓN DE FECHA CORREGIDA ---
+// --- FUNCIÓN DE FECHA ---
 function formatearFecha(fechaOriginal) {
   if (!fechaOriginal) return '';
   
@@ -302,11 +304,12 @@ function getDistance(touches) {
   );
 }
 
-// Eventos para detectar pulsación sostenida
+// Eventos para detectar pulsación sostenida en escritorio
 modalImg.addEventListener('mousedown', iniciarPulsacion);
 modalImg.addEventListener('mouseup', cancelarPulsacion);
 modalImg.addEventListener('mouseleave', cancelarPulsacion);
 
+// Eventos táctiles optimizados para Android y iOS
 modalImg.addEventListener('touchstart', (e) => {
   if (e.touches.length === 2) {
     cancelarPulsacion();
@@ -317,15 +320,17 @@ modalImg.addEventListener('touchstart', (e) => {
       startX = e.touches[0].clientX - posX;
       startY = e.touches[0].clientY - posY;
     } else {
+      // CANCELA EL MENÚ CONTEXTUAL NATIVO DE ANDROID EN EL TOUCH INICIAL
+      if (e.cancelable) e.preventDefault();
       iniciarPulsacion();
     }
   }
-});
+}, { passive: false });
 
 modalImg.addEventListener('touchmove', (e) => {
   if (e.touches.length === 2) {
     cancelarPulsacion();
-    e.preventDefault();
+    if (e.cancelable) e.preventDefault();
     const currentDistance = getDistance(e.touches);
     if (startDistance > 0) {
       scale = Math.min(Math.max(1, lastScale * (currentDistance / startDistance)), 4);
@@ -333,12 +338,12 @@ modalImg.addEventListener('touchmove', (e) => {
     }
   } else if (e.touches.length === 1 && isDragging && scale > 1) {
     cancelarPulsacion();
-    e.preventDefault();
+    if (e.cancelable) e.preventDefault();
     posX = e.touches[0].clientX - startX;
     posY = e.touches[0].clientY - startY;
     modalImg.style.transform = `translate(${posX}px, ${posY}px) scale(${scale})`;
   }
-});
+}, { passive: false });
 
 modalImg.addEventListener('touchend', (e) => {
   cancelarPulsacion();
@@ -357,7 +362,6 @@ modalImg.addEventListener('touchcancel', cancelarPulsacion);
 
 modalImg.addEventListener('click', (e) => {
   e.stopPropagation();
-  // Evita cerrar o resetear si fue una pulsación sostenida para leer la descripción
   if (isPressing) {
     isPressing = false;
     return;
@@ -382,7 +386,7 @@ modalVideo.addEventListener('touchend', function(e) {
   const diferenciaToques = tiempoActual - ultimoToqueVideo;
 
   if (diferenciaToques < 300 && diferenciaToques > 0) {
-    e.preventDefault();
+    if (e.cancelable) e.preventDefault();
     cerrarModal();
   }
   ultimoToqueVideo = tiempoActual;
