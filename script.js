@@ -9,6 +9,7 @@ const tituloPais = document.getElementById('titulo-pais');
 const tituloAnio = document.getElementById('titulo-anio');
 const contenedorGaleria = document.getElementById('galeria');
 const modal = document.querySelector('.modal');
+const modalMediaWrapper = document.querySelector('.modal-media-wrapper');
 const modalImg = document.getElementById('modal-img');
 const modalVideo = document.getElementById('modal-video');
 
@@ -20,7 +21,6 @@ const descOverlay = document.getElementById('description-overlay');
 
 const clasesTamano = ['', '', 'span-col-2', 'span-row-2', 'span-big'];
 
-// Variables para control de Zoom táctil en Modal
 let scale = 1;
 let lastScale = 1;
 let startDistance = 0;
@@ -30,11 +30,9 @@ let startX = 0;
 let startY = 0;
 let isDragging = false;
 
-// Variables para detección de pulsación sostenida (Hold)
 let pressTimer = null;
 let isPressing = false;
 
-// Deshabilitar menú contextual
 document.addEventListener('contextmenu', function(e) {
   if (e.target.tagName === 'IMG' || e.target.tagName === 'VIDEO' || e.target.closest('.modal')) {
     e.preventDefault();
@@ -54,7 +52,6 @@ function resolverRuta(url) {
   return rutaCarpeta + url;
 }
 
-// --- FUNCIÓN DE FECHA CORREGIDA ---
 function formatearFecha(fechaOriginal) {
   if (!fechaOriginal) return '';
   
@@ -108,11 +105,11 @@ function cerrarModal() {
   modalVideo.removeAttribute('src');
   modalVideo.load();
   modalImg.src = '';
+  modalMediaWrapper.style.width = '';
   ocultarOverlayDesc();
   resetZoom();
 }
 
-// --- FUNCIONES Y EVENTOS DE DESCRIPCIÓN AL MANTENER PRESIONADO ---
 function mostrarOverlayDesc() {
   const texto = infoDescripcion.textContent.trim();
   if (texto) {
@@ -139,7 +136,13 @@ function cancelarPulsacion() {
   ocultarOverlayDesc();
 }
 
-// --- CARGA Y RENDERIZADO DE DATOS (FETCH) ---
+// Mide los bordes exactos de la foto renderizada
+modalImg.onload = () => {
+  if (modalImg.clientWidth > 0) {
+    modalMediaWrapper.style.width = `${modalImg.clientWidth}px`;
+  }
+};
+
 fetch(rutaJson)
   .then(res => {
     if (!res.ok) throw new Error("Galería no encontrada");
@@ -260,6 +263,8 @@ function inicializarEventos() {
       const desc = anchor.dataset.descripcion;
       infoDescripcion.textContent = desc || '';
 
+      modalMediaWrapper.style.width = 'auto';
+
       if (esVid) {
         modalImg.style.display = 'none';
         modalImg.src = '';
@@ -284,7 +289,6 @@ function inicializarEventos() {
   });
 }
 
-// --- CONTROL DE GESTOS MOUSE / TÁCTIL EN IMAGEN DEL MODAL ---
 function getDistance(touches) {
   return Math.hypot(
     touches[0].clientX - touches[1].clientX,
@@ -292,7 +296,6 @@ function getDistance(touches) {
   );
 }
 
-// Eventos para detectar pulsación sostenida
 modalImg.addEventListener('mousedown', iniciarPulsacion);
 modalImg.addEventListener('mouseup', cancelarPulsacion);
 modalImg.addEventListener('mouseleave', cancelarPulsacion);
@@ -347,7 +350,6 @@ modalImg.addEventListener('touchcancel', cancelarPulsacion);
 
 modalImg.addEventListener('click', (e) => {
   e.stopPropagation();
-  // Evita cerrar o resetear si fue una pulsación sostenida para leer la descripción
   if (isPressing) {
     isPressing = false;
     return;
@@ -361,7 +363,7 @@ modalImg.addEventListener('click', (e) => {
 });
 
 modal.addEventListener('click', (e) => {
-  if (e.target === modal || e.target.classList.contains('modal-media-wrapper')) {
+  if (e.target === modal || e.target.classList.contains('modal-media-wrapper') || e.target.classList.contains('modal-content')) {
     cerrarModal();
   }
 });
