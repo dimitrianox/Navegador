@@ -147,7 +147,7 @@ main a:hover video {
 }
 
 /* =========================================================
-   MODAL - PANTALLA COMPLETA CON TEXTOS ENMARCADOS (CORREGIDO iOS / ANDROID)
+   MODAL - PANTALLA COMPLETA CON TEXTOS ENMARCADOS (CORREGIDO iOS)
    ========================================================= */
 div.modal {
   position: fixed;
@@ -332,8 +332,16 @@ div.modal img:active {
   }
 }
 
-/* BLOQUEO ESTRICTO DE MENÚ NATIVO Y SELECCIÓN EN ANDROID Y iOS */
-img, video, a, .modal-media-wrapper, .description-overlay {
+/* BLOQUEO ABSOLUTO DE MENÚ CONTEXTUAL NATIVO EN GRILLA Y MODAL */
+#galeria,
+#galeria a,
+#galeria img,
+#galeria video,
+.modal,
+.modal-media-wrapper,
+.modal img,
+.modal video,
+.description-overlay {
   -webkit-touch-callout: none !important;
   -webkit-user-select: none !important;
   -khtml-user-select: none !important;
@@ -341,8 +349,4 @@ img, video, a, .modal-media-wrapper, .description-overlay {
   -ms-user-select: none !important;
   user-select: none !important;
   -webkit-user-drag: none !important;
-}
-
-main a, .modal img, .modal video, .modal-media-wrapper {
-  -webkit-touch-callout: none !important;
 }

@@ -34,23 +34,19 @@ let isDragging = false;
 let pressTimer = null;
 let isPressing = false;
 
-// --- DESHABILITAR MENÚ CONTEXTUAL ABSOLUTO EN ANDROID Y iOS ---
-function bloquearAccionNativa(e) {
-  if (
-    e.target.tagName === 'IMG' || 
-    e.target.tagName === 'VIDEO' || 
-    e.target.closest('.modal') || 
-    e.target.closest('#galeria')
-  ) {
-    if (e.cancelable) e.preventDefault();
-    e.stopPropagation();
-    return false;
+// --- DESHABILITAR MENÚ NATIVO Y LONG-PRESS EN ANDROID / iOS ---
+function anularAccionNativa(e) {
+  if (e.cancelable) {
+    e.preventDefault();
   }
+  e.stopPropagation();
+  return false;
 }
 
+// Bloqueo global en fase de captura para impedir menús contextuales
 ['contextmenu', 'selectstart', 'dragstart'].forEach(evento => {
-  window.addEventListener(evento, bloquearAccionNativa, { capture: true, passive: false });
-  document.addEventListener(evento, bloquearAccionNativa, { capture: true, passive: false });
+  window.addEventListener(evento, anularAccionNativa, { capture: true, passive: false });
+  document.addEventListener(evento, anularAccionNativa, { capture: true, passive: false });
 });
 
 function esVideo(url, tipo) {
@@ -66,7 +62,7 @@ function resolverRuta(url) {
   return rutaCarpeta + url;
 }
 
-// --- FUNCIÓN DE FECHA ---
+// --- FUNCIÓN DE FECHA CORREGIDA ---
 function formatearFecha(fechaOriginal) {
   if (!fechaOriginal) return '';
   
@@ -258,6 +254,9 @@ fetch(rutaJson)
 
 function inicializarEventos() {
   contenedorGaleria.querySelectorAll('a').forEach(anchor => {
+    // Bloquea el menú contextual en los enlaces de la grilla
+    anchor.addEventListener('contextmenu', anularAccionNativa, true);
+
     anchor.addEventListener('click', (e) => {
       e.preventDefault();
 
@@ -309,7 +308,7 @@ modalImg.addEventListener('mousedown', iniciarPulsacion);
 modalImg.addEventListener('mouseup', cancelarPulsacion);
 modalImg.addEventListener('mouseleave', cancelarPulsacion);
 
-// Eventos táctiles optimizados para Android y iOS
+// Eventos táctiles en móvil (Android & iOS)
 modalImg.addEventListener('touchstart', (e) => {
   if (e.touches.length === 2) {
     cancelarPulsacion();
@@ -320,7 +319,7 @@ modalImg.addEventListener('touchstart', (e) => {
       startX = e.touches[0].clientX - posX;
       startY = e.touches[0].clientY - posY;
     } else {
-      // CANCELA EL MENÚ CONTEXTUAL NATIVO DE ANDROID EN EL TOUCH INICIAL
+      // Bloquea el temporizador de menú nativo de Android en el toque inicial
       if (e.cancelable) e.preventDefault();
       iniciarPulsacion();
     }
