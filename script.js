@@ -371,3 +371,17 @@ modalVideo.addEventListener('touchend', function(e) {
   }
   ultimoToqueVideo = tiempoActual;
 });
+
+/* ===== FIX IOS ===== */
+
+@supports (-webkit-touch-callout: none) {
+
+  .modal-content {
+    overflow: visible !important;
+  }
+
+  .modal-media-wrapper {
+    overflow: visible !important;
+  }
+
+}
