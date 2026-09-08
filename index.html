@@ -13,7 +13,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,400&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=3">
+  <link rel="stylesheet" href="styles.css?v=5">
 </head>
 <body>
 
@@ -46,10 +46,10 @@
         <span id="info-fecha"></span>
       </div>
 
-      <!-- Contenedor de imagen/video e overlay de descripción -->
-      <div class="modal-media-wrapper">
-        <img src="" alt="" id="modal-img" style="display: none;" referrerpolicy="no-referrer" oncontextmenu="return false;" />
-        <video id="modal-video" controls style="display: none;" playsinline referrerpolicy="no-referrer" oncontextmenu="return false;"></video>
+      <!-- Contenedor de imagen/video e overlay de descripción (ID asignado para gestos) -->
+      <div class="modal-media-wrapper" id="modal-media-wrapper">
+        <img src="" alt="" id="modal-img" style="display: none;" referrerpolicy="no-referrer" />
+        <video id="modal-video" controls style="display: none;" playsinline referrerpolicy="no-referrer"></video>
         
         <!-- Capa superpuesta para la descripción al mantener presionado -->
         <div id="description-overlay" class="description-overlay"></div>

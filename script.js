@@ -9,6 +9,7 @@ const tituloPais = document.getElementById('titulo-pais');
 const tituloAnio = document.getElementById('titulo-anio');
 const contenedorGaleria = document.getElementById('galeria');
 const modal = document.querySelector('.modal');
+const modalMediaWrapper = document.getElementById('modal-media-wrapper');
 const modalImg = document.getElementById('modal-img');
 const modalVideo = document.getElementById('modal-video');
 
@@ -34,16 +35,13 @@ let isDragging = false;
 let pressTimer = null;
 let isPressing = false;
 
-// --- DESHABILITAR MENÚ NATIVO Y LONG-PRESS EN ANDROID / iOS ---
+// Bloqueo estricto global en fase de captura
 function anularAccionNativa(e) {
-  if (e.cancelable) {
-    e.preventDefault();
-  }
+  if (e.cancelable) e.preventDefault();
   e.stopPropagation();
   return false;
 }
 
-// Bloqueo global en fase de captura para impedir menús contextuales
 ['contextmenu', 'selectstart', 'dragstart'].forEach(evento => {
   window.addEventListener(evento, anularAccionNativa, { capture: true, passive: false });
   document.addEventListener(evento, anularAccionNativa, { capture: true, passive: false });
@@ -254,7 +252,6 @@ fetch(rutaJson)
 
 function inicializarEventos() {
   contenedorGaleria.querySelectorAll('a').forEach(anchor => {
-    // Bloquea el menú contextual en los enlaces de la grilla
     anchor.addEventListener('contextmenu', anularAccionNativa, true);
 
     anchor.addEventListener('click', (e) => {
@@ -295,7 +292,7 @@ function inicializarEventos() {
   });
 }
 
-// --- CONTROL DE GESTOS MOUSE / TÁCTIL EN IMAGEN DEL MODAL ---
+// --- CONTROL DE GESTOS EN EL CONTENEDOR WRAPPER DEL MODAL ---
 function getDistance(touches) {
   return Math.hypot(
     touches[0].clientX - touches[1].clientX,
@@ -303,13 +300,13 @@ function getDistance(touches) {
   );
 }
 
-// Eventos para detectar pulsación sostenida en escritorio
-modalImg.addEventListener('mousedown', iniciarPulsacion);
-modalImg.addEventListener('mouseup', cancelarPulsacion);
-modalImg.addEventListener('mouseleave', cancelarPulsacion);
+// Mouse (Escritorio)
+modalMediaWrapper.addEventListener('mousedown', iniciarPulsacion);
+modalMediaWrapper.addEventListener('mouseup', cancelarPulsacion);
+modalMediaWrapper.addEventListener('mouseleave', cancelarPulsacion);
 
-// Eventos táctiles en móvil (Android & iOS)
-modalImg.addEventListener('touchstart', (e) => {
+// Táctil (Móvil - Todos los navegadores de Android/iOS)
+modalMediaWrapper.addEventListener('touchstart', (e) => {
   if (e.touches.length === 2) {
     cancelarPulsacion();
     startDistance = getDistance(e.touches);
@@ -319,14 +316,13 @@ modalImg.addEventListener('touchstart', (e) => {
       startX = e.touches[0].clientX - posX;
       startY = e.touches[0].clientY - posY;
     } else {
-      // Bloquea el temporizador de menú nativo de Android en el toque inicial
       if (e.cancelable) e.preventDefault();
       iniciarPulsacion();
     }
   }
 }, { passive: false });
 
-modalImg.addEventListener('touchmove', (e) => {
+modalMediaWrapper.addEventListener('touchmove', (e) => {
   if (e.touches.length === 2) {
     cancelarPulsacion();
     if (e.cancelable) e.preventDefault();
@@ -344,7 +340,7 @@ modalImg.addEventListener('touchmove', (e) => {
   }
 }, { passive: false });
 
-modalImg.addEventListener('touchend', (e) => {
+modalMediaWrapper.addEventListener('touchend', (e) => {
   cancelarPulsacion();
   if (e.touches.length < 2) {
     lastScale = scale;
@@ -357,9 +353,9 @@ modalImg.addEventListener('touchend', (e) => {
   }
 });
 
-modalImg.addEventListener('touchcancel', cancelarPulsacion);
+modalMediaWrapper.addEventListener('touchcancel', cancelarPulsacion);
 
-modalImg.addEventListener('click', (e) => {
+modalMediaWrapper.addEventListener('click', (e) => {
   e.stopPropagation();
   if (isPressing) {
     isPressing = false;
