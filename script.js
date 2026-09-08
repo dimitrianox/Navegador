@@ -9,7 +9,6 @@ const tituloPais = document.getElementById('titulo-pais');
 const tituloAnio = document.getElementById('titulo-anio');
 const contenedorGaleria = document.getElementById('galeria');
 const modal = document.querySelector('.modal');
-const modalMediaWrapper = document.querySelector('.modal-media-wrapper');
 const modalImg = document.getElementById('modal-img');
 const modalVideo = document.getElementById('modal-video');
 
@@ -21,6 +20,7 @@ const descOverlay = document.getElementById('description-overlay');
 
 const clasesTamano = ['', '', 'span-col-2', 'span-row-2', 'span-big'];
 
+// Variables para control de Zoom táctil en Modal
 let scale = 1;
 let lastScale = 1;
 let startDistance = 0;
@@ -30,9 +30,11 @@ let startX = 0;
 let startY = 0;
 let isDragging = false;
 
+// Variables para detección de pulsación sostenida (Hold)
 let pressTimer = null;
 let isPressing = false;
 
+// Deshabilitar menú contextual
 document.addEventListener('contextmenu', function(e) {
   if (e.target.tagName === 'IMG' || e.target.tagName === 'VIDEO' || e.target.closest('.modal')) {
     e.preventDefault();
@@ -105,7 +107,6 @@ function cerrarModal() {
   modalVideo.removeAttribute('src');
   modalVideo.load();
   modalImg.src = '';
-  modalMediaWrapper.style.width = '';
   ocultarOverlayDesc();
   resetZoom();
 }
@@ -135,13 +136,6 @@ function cancelarPulsacion() {
   clearTimeout(pressTimer);
   ocultarOverlayDesc();
 }
-
-// Mide los bordes exactos de la foto renderizada
-modalImg.onload = () => {
-  if (modalImg.clientWidth > 0) {
-    modalMediaWrapper.style.width = `${modalImg.clientWidth}px`;
-  }
-};
 
 fetch(rutaJson)
   .then(res => {
@@ -263,8 +257,6 @@ function inicializarEventos() {
       const desc = anchor.dataset.descripcion;
       infoDescripcion.textContent = desc || '';
 
-      modalMediaWrapper.style.width = 'auto';
-
       if (esVid) {
         modalImg.style.display = 'none';
         modalImg.src = '';
@@ -363,7 +355,7 @@ modalImg.addEventListener('click', (e) => {
 });
 
 modal.addEventListener('click', (e) => {
-  if (e.target === modal || e.target.classList.contains('modal-media-wrapper') || e.target.classList.contains('modal-content')) {
+  if (e.target === modal || e.target.classList.contains('modal-media-wrapper')) {
     cerrarModal();
   }
 });
