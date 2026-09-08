@@ -34,12 +34,22 @@ let isDragging = false;
 let pressTimer = null;
 let isPressing = false;
 
-// Deshabilitar menú contextual
-document.addEventListener('contextmenu', function(e) {
-  if (e.target.tagName === 'IMG' || e.target.tagName === 'VIDEO' || e.target.closest('.modal')) {
+// --- DESHABILITAR MENÚ CONTEXTUAL EN ANDROID Y iOS (FASE DE CAPTURA) ---
+function bloquearMenuContextual(e) {
+  if (
+    e.target.tagName === 'IMG' || 
+    e.target.tagName === 'VIDEO' || 
+    e.target.closest('.modal') || 
+    e.target.closest('#galeria')
+  ) {
     e.preventDefault();
+    e.stopPropagation();
+    return false;
   }
-}, false);
+}
+
+window.addEventListener('contextmenu', bloquearMenuContextual, true);
+document.addEventListener('contextmenu', bloquearMenuContextual, true);
 
 function esVideo(url, tipo) {
   if (tipo === 'video') return true;
