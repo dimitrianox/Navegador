@@ -31,18 +31,17 @@ let startX = 0;
 let startY = 0;
 let isDragging = false;
 
-// Variables para detección de pulsación sostenida (Hold) y Tap
+// Variables para detección de pulsación sostenida (Hold) y Tap de cierre
 let pressTimer = null;
 let isPressing = false;
 let isHoldActive = false;
+let touchStartPos = { x: 0, y: 0 };
 
-// Bloqueo global de menú contextual
+// Bloqueo global estricto de menú contextual
 function anularAccionNativa(e) {
-  if (e.target.tagName === 'IMG' || e.target.tagName === 'VIDEO' || e.target.closest('.modal') || e.target.closest('#galeria')) {
-    e.preventDefault();
-    e.stopPropagation();
-    return false;
-  }
+  if (e.cancelable) e.preventDefault();
+  e.stopPropagation();
+  return false;
 }
 
 ['contextmenu', 'selectstart', 'dragstart'].forEach(evento => {
@@ -148,7 +147,6 @@ function iniciarPulsacion() {
 function cancelarPulsacion() {
   clearTimeout(pressTimer);
   ocultarOverlayDesc();
-  // Se restablece la bandera después de un breve delay para permitir que el click ignore este ciclo si fue un Hold
   setTimeout(() => {
     isPressing = false;
   }, 50);
@@ -299,7 +297,7 @@ function inicializarEventos() {
   });
 }
 
-// --- CONTROL DE GESTOS EN MODAL (ESCRITORIO Y MÓVIL) ---
+// --- CONTROL DE GESTOS EN EL WRAPPER DEL MODAL (ESCRITORIO Y MÓVIL) ---
 function getDistance(touches) {
   return Math.hypot(
     touches[0].clientX - touches[1].clientX,
@@ -307,17 +305,24 @@ function getDistance(touches) {
   );
 }
 
-// Eventos de ratón
-modalImg.addEventListener('mousedown', iniciarPulsacion);
-modalImg.addEventListener('mouseup', cancelarPulsacion);
-modalImg.addEventListener('mouseleave', cancelarPulsacion);
+// Eventos Escritorio (Mouse)
+modalMediaWrapper.addEventListener('mousedown', iniciarPulsacion);
+modalMediaWrapper.addEventListener('mouseup', () => {
+  cancelarPulsacion();
+  if (!isHoldActive) {
+    if (scale > 1) resetZoom();
+    else cerrarModal();
+  }
+});
+modalMediaWrapper.addEventListener('mouseleave', cancelarPulsacion);
 
-// Eventos táctiles
-modalImg.addEventListener('touchstart', (e) => {
+// Eventos Táctiles (Móvil)
+modalMediaWrapper.addEventListener('touchstart', (e) => {
   if (e.touches.length === 2) {
     cancelarPulsacion();
     startDistance = getDistance(e.touches);
   } else if (e.touches.length === 1) {
+    touchStartPos = { x: e.touches[0].clientX, y: e.touches[0].clientY };
     if (scale > 1) {
       isDragging = true;
       startX = e.touches[0].clientX - posX;
@@ -326,12 +331,12 @@ modalImg.addEventListener('touchstart', (e) => {
       iniciarPulsacion();
     }
   }
-});
+}, { passive: true });
 
-modalImg.addEventListener('touchmove', (e) => {
+modalMediaWrapper.addEventListener('touchmove', (e) => {
   if (e.touches.length === 2) {
     cancelarPulsacion();
-    e.preventDefault();
+    if (e.cancelable) e.preventDefault();
     const currentDistance = getDistance(e.touches);
     if (startDistance > 0) {
       scale = Math.min(Math.max(1, lastScale * (currentDistance / startDistance)), 4);
@@ -339,46 +344,46 @@ modalImg.addEventListener('touchmove', (e) => {
     }
   } else if (e.touches.length === 1 && isDragging && scale > 1) {
     cancelarPulsacion();
-    e.preventDefault();
+    if (e.cancelable) e.preventDefault();
     posX = e.touches[0].clientX - startX;
     posY = e.touches[0].clientY - startY;
     modalImg.style.transform = `translate(${posX}px, ${posY}px) scale(${scale})`;
   }
-});
+}, { passive: false });
 
-modalImg.addEventListener('touchend', (e) => {
+modalMediaWrapper.addEventListener('touchend', (e) => {
   cancelarPulsacion();
+
   if (e.touches.length < 2) {
     lastScale = scale;
   }
+
+  // Comprobar si fue un toque rápido (Tap) sin desplazamiento de arrastre
+  if (e.changedTouches.length > 0) {
+    const endX = e.changedTouches[0].clientX;
+    const endY = e.changedTouches[0].clientY;
+    const delta = Math.hypot(endX - touchStartPos.x, endY - touchStartPos.y);
+
+    if (!isHoldActive && delta < 8) {
+      if (scale > 1) {
+        resetZoom();
+      } else {
+        cerrarModal();
+      }
+    }
+  }
+
   if (e.touches.length === 0) {
     isDragging = false;
-    if (scale <= 1 && !isHoldActive) {
-      // Si soltó tras un toque normal (sin haber activado el overlay de descripción)
-      // resetZoom se ejecuta automáticamente
+    if (scale <= 1) {
+      resetZoom();
     }
   }
 });
 
-modalImg.addEventListener('touchcancel', cancelarPulsacion);
+modalMediaWrapper.addEventListener('touchcancel', cancelarPulsacion);
 
-// Clic directo sobre la imagen para cerrar o resetear Zoom
-modalImg.addEventListener('click', (e) => {
-  e.stopPropagation();
-  
-  if (isHoldActive) {
-    isHoldActive = false;
-    return;
-  }
-
-  if (scale > 1) {
-    resetZoom();
-  } else {
-    cerrarModal();
-  }
-});
-
-// Clic en el fondo oscuro del modal para cerrar
+// Cierre al presionar el área oscura fuera del marco
 modal.addEventListener('click', (e) => {
   if (e.target === modal || e.target.classList.contains('modal-media-wrapper')) {
     cerrarModal();
@@ -391,7 +396,7 @@ modalVideo.addEventListener('touchend', function(e) {
   const diferenciaToques = tiempoActual - ultimoToqueVideo;
 
   if (diferenciaToques < 300 && diferenciaToques > 0) {
-    e.preventDefault();
+    if (e.cancelable) e.preventDefault();
     cerrarModal();
   }
   ultimoToqueVideo = tiempoActual;

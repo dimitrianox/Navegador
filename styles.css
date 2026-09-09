@@ -200,6 +200,7 @@ div.modal.overlay {
   padding: 4px 0;
   overflow: hidden;
   cursor: grab;
+  touch-action: none;
 }
 
 .modal-media-wrapper:active {
@@ -221,9 +222,11 @@ div.modal video {
   will-change: transform;
 }
 
-div.modal img {
-  pointer-events: auto;
-  touch-action: none;
+/* EL TRUCO CLAVE: Desactivar puntero directo en img/video en el modal.
+   Evita que Android detecte que estás presionando una imagen */
+.modal-media-wrapper img,
+.modal-media-wrapper video {
+  pointer-events: none !important;
 }
 
 /* ENCABEZADO Y PIE (Estructura de Flujo Flex) */
@@ -332,7 +335,7 @@ div.modal img {
   }
 }
 
-/* BLOQUEO DE ACCIONES NATIVAS DE NAVEGADOR */
+/* BLOQUEO DE SELECCIÓN Y LLAMADA TÁCTIL EN iOS / ANDROID */
 img, video, a {
   -webkit-touch-callout: none !important;
   -webkit-user-select: none !important;
