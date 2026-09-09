@@ -35,7 +35,7 @@ let isPressing = false;
 let touchStartPos = { x: 0, y: 0 };
 let descripcionActiva = '';
 
-// BLOQUEO ESTRICATO GLOBAL DE MENÚ CONTEXTUAL Y SELECCIÓN
+// BLOQUEO ESTRICATO GLOBAL DE MENÚ CONTEXTUAL Y SELECCIÓN EN CAPTURA
 function anularAccionNativa(e) {
   if (e.cancelable) e.preventDefault();
   e.stopPropagation();
@@ -103,6 +103,7 @@ function resetZoom() {
   lastScale = 1;
   posX = 0;
   posY = 0;
+  isDragging = false;
   modalImg.style.transform = `translate(0px, 0px) scale(1)`;
 }
 
@@ -252,6 +253,11 @@ fetch(rutaJson)
 function inicializarEventos() {
   contenedorGaleria.querySelectorAll('a').forEach(anchor => {
     anchor.addEventListener('contextmenu', anularAccionNativa, true);
+    
+    // Anula menú contextual nativo en toques prolongados sobre la grilla
+    anchor.addEventListener('touchstart', (e) => {
+      touchStartPos = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+    }, { passive: true });
 
     anchor.addEventListener('click', (e) => {
       e.preventDefault();
