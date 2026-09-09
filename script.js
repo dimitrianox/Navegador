@@ -34,14 +34,15 @@ let isDragging = false;
 // Variables para detección de pulsación sostenida (Hold) y Tap
 let pressTimer = null;
 let isPressing = false;
-let touchStartTime = 0;
-let touchStartPos = { x: 0, y: 0 };
+let isHoldActive = false;
 
-// Bloqueo global de menús contextuales en fase de captura
+// Bloqueo global de menú contextual
 function anularAccionNativa(e) {
-  if (e.cancelable) e.preventDefault();
-  e.stopPropagation();
-  return false;
+  if (e.target.tagName === 'IMG' || e.target.tagName === 'VIDEO' || e.target.closest('.modal') || e.target.closest('#galeria')) {
+    e.preventDefault();
+    e.stopPropagation();
+    return false;
+  }
 }
 
 ['contextmenu', 'selectstart', 'dragstart'].forEach(evento => {
@@ -135,9 +136,11 @@ function ocultarOverlayDesc() {
 
 function iniciarPulsacion() {
   isPressing = false;
+  isHoldActive = false;
   clearTimeout(pressTimer);
   pressTimer = setTimeout(() => {
     isPressing = true;
+    isHoldActive = true;
     mostrarOverlayDesc();
   }, 280);
 }
@@ -145,6 +148,10 @@ function iniciarPulsacion() {
 function cancelarPulsacion() {
   clearTimeout(pressTimer);
   ocultarOverlayDesc();
+  // Se restablece la bandera después de un breve delay para permitir que el click ignore este ciclo si fue un Hold
+  setTimeout(() => {
+    isPressing = false;
+  }, 50);
 }
 
 // --- CARGA Y RENDERIZADO DE DATOS (FETCH) ---
@@ -254,8 +261,6 @@ fetch(rutaJson)
 
 function inicializarEventos() {
   contenedorGaleria.querySelectorAll('a').forEach(anchor => {
-    anchor.addEventListener('contextmenu', anularAccionNativa, true);
-
     anchor.addEventListener('click', (e) => {
       e.preventDefault();
 
@@ -294,7 +299,7 @@ function inicializarEventos() {
   });
 }
 
-// --- CONTROL DE GESTOS MOUSE Y TÁCTIL (ZOOM, HOLD Y CIERRE POR TOQUE) ---
+// --- CONTROL DE GESTOS EN MODAL (ESCRITORIO Y MÓVIL) ---
 function getDistance(touches) {
   return Math.hypot(
     touches[0].clientX - touches[1].clientX,
@@ -302,35 +307,17 @@ function getDistance(touches) {
   );
 }
 
-// Control Escritorio (Mouse)
-modalMediaWrapper.addEventListener('mousedown', (e) => {
-  touchStartTime = Date.now();
-  iniciarPulsacion();
-});
+// Eventos de ratón
+modalImg.addEventListener('mousedown', iniciarPulsacion);
+modalImg.addEventListener('mouseup', cancelarPulsacion);
+modalImg.addEventListener('mouseleave', cancelarPulsacion);
 
-modalMediaWrapper.addEventListener('mouseup', (e) => {
-  cancelarPulsacion();
-  const duration = Date.now() - touchStartTime;
-  if (!isPressing && duration < 250) {
-    if (scale > 1) {
-      resetZoom();
-    } else {
-      cerrarModal();
-    }
-  }
-});
-
-modalMediaWrapper.addEventListener('mouseleave', cancelarPulsacion);
-
-// Control Móvil Táctil (Android / iOS)
-modalMediaWrapper.addEventListener('touchstart', (e) => {
-  touchStartTime = Date.now();
-  
+// Eventos táctiles
+modalImg.addEventListener('touchstart', (e) => {
   if (e.touches.length === 2) {
     cancelarPulsacion();
     startDistance = getDistance(e.touches);
   } else if (e.touches.length === 1) {
-    touchStartPos = { x: e.touches[0].clientX, y: e.touches[0].clientY };
     if (scale > 1) {
       isDragging = true;
       startX = e.touches[0].clientX - posX;
@@ -339,12 +326,12 @@ modalMediaWrapper.addEventListener('touchstart', (e) => {
       iniciarPulsacion();
     }
   }
-}, { passive: true });
+});
 
-modalMediaWrapper.addEventListener('touchmove', (e) => {
+modalImg.addEventListener('touchmove', (e) => {
   if (e.touches.length === 2) {
     cancelarPulsacion();
-    if (e.cancelable) e.preventDefault();
+    e.preventDefault();
     const currentDistance = getDistance(e.touches);
     if (startDistance > 0) {
       scale = Math.min(Math.max(1, lastScale * (currentDistance / startDistance)), 4);
@@ -352,46 +339,46 @@ modalMediaWrapper.addEventListener('touchmove', (e) => {
     }
   } else if (e.touches.length === 1 && isDragging && scale > 1) {
     cancelarPulsacion();
-    if (e.cancelable) e.preventDefault();
+    e.preventDefault();
     posX = e.touches[0].clientX - startX;
     posY = e.touches[0].clientY - startY;
     modalImg.style.transform = `translate(${posX}px, ${posY}px) scale(${scale})`;
   }
-}, { passive: false });
+});
 
-modalMediaWrapper.addEventListener('touchend', (e) => {
+modalImg.addEventListener('touchend', (e) => {
   cancelarPulsacion();
-  const duration = Date.now() - touchStartTime;
-
   if (e.touches.length < 2) {
     lastScale = scale;
   }
-
-  if (e.changedTouches.length > 0) {
-    const endPos = { x: e.changedTouches[0].clientX, y: e.changedTouches[0].clientY };
-    const distMoved = Math.hypot(endPos.x - touchStartPos.x, endPos.y - touchStartPos.y);
-
-    // Si fue un toque rápido (< 250ms) y sin desplazamiento significativo (< 10px)
-    if (!isPressing && duration < 250 && distMoved < 10) {
-      if (scale > 1) {
-        resetZoom();
-      } else {
-        cerrarModal();
-      }
-    }
-  }
-
   if (e.touches.length === 0) {
     isDragging = false;
-    if (scale <= 1) {
-      resetZoom();
+    if (scale <= 1 && !isHoldActive) {
+      // Si soltó tras un toque normal (sin haber activado el overlay de descripción)
+      // resetZoom se ejecuta automáticamente
     }
   }
 });
 
-modalMediaWrapper.addEventListener('touchcancel', cancelarPulsacion);
+modalImg.addEventListener('touchcancel', cancelarPulsacion);
 
-// Cierre al hacer clic fuera del contenido del modal
+// Clic directo sobre la imagen para cerrar o resetear Zoom
+modalImg.addEventListener('click', (e) => {
+  e.stopPropagation();
+  
+  if (isHoldActive) {
+    isHoldActive = false;
+    return;
+  }
+
+  if (scale > 1) {
+    resetZoom();
+  } else {
+    cerrarModal();
+  }
+});
+
+// Clic en el fondo oscuro del modal para cerrar
 modal.addEventListener('click', (e) => {
   if (e.target === modal || e.target.classList.contains('modal-media-wrapper')) {
     cerrarModal();
@@ -404,7 +391,7 @@ modalVideo.addEventListener('touchend', function(e) {
   const diferenciaToques = tiempoActual - ultimoToqueVideo;
 
   if (diferenciaToques < 300 && diferenciaToques > 0) {
-    if (e.cancelable) e.preventDefault();
+    e.preventDefault();
     cerrarModal();
   }
   ultimoToqueVideo = tiempoActual;

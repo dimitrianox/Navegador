@@ -114,6 +114,8 @@ main a {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
   background-color: #050b14;
   transition: border-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+  pointer-events: auto !important;
+  touch-action: auto;
 }
 
 main a:hover,
@@ -188,7 +190,7 @@ div.modal.overlay {
   overflow: hidden;
 }
 
-/* MARCO CONTENEDOR PRINCIPAL */
+/* MARCO CONTENEDOR PRINCIPAL - COMPATIBLE CON WEBKIT / iOS / ANDROID */
 .modal-media-wrapper {
   position: relative;
   flex: 1 1 auto;
@@ -200,6 +202,8 @@ div.modal.overlay {
   padding: 4px 0;
   overflow: hidden;
   cursor: grab;
+  pointer-events: auto !important;
+  touch-action: none;
 }
 
 .modal-media-wrapper:active {
@@ -219,11 +223,6 @@ div.modal video {
   transform-origin: center center;
   transition: transform 0.05s linear;
   will-change: transform;
-}
-
-div.modal img {
-  pointer-events: auto;
-  touch-action: none;
 }
 
 /* ENCABEZADO Y PIE (Estructura de Flujo Flex) */
@@ -332,10 +331,14 @@ div.modal img {
   }
 }
 
-/* BLOQUEO DE ACCIONES NATIVAS DE NAVEGADOR */
-img, video, a {
+/* DESACTIVACIÓN DE PUNTEROS EN IMÁGENES Y VIDEOS (EVITA MENÚ NATIVO EN BING/NATIVOS) */
+img, video {
+  pointer-events: none !important;
   -webkit-touch-callout: none !important;
   -webkit-user-select: none !important;
+  -khtml-user-select: none !important;
+  -moz-user-select: none !important;
+  -ms-user-select: none !important;
   user-select: none !important;
   -webkit-user-drag: none !important;
 }
