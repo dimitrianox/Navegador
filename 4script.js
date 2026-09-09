@@ -60,6 +60,7 @@ function resolverRuta(url) {
   return rutaCarpeta + url;
 }
 
+// --- FUNCIÓN DE FECHA CORREGIDA ---
 function formatearFecha(fechaOriginal) {
   if (!fechaOriginal) return '';
   
@@ -112,9 +113,7 @@ function cerrarModal() {
   modalVideo.pause();
   modalVideo.removeAttribute('src');
   modalVideo.load();
-  modalVideo.style.display = 'none';
   modalImg.src = '';
-  modalImg.style.display = 'none';
   ocultarOverlayDesc();
   resetZoom();
 }
@@ -293,8 +292,7 @@ function inicializarEventos() {
   });
 }
 
-// --- GESTIÓN DE EVENTOS DE INTERACCIÓN Y NAVEGACIÓN ---
-
+// --- CONTROL DE GESTOS EN EL CONTENEDOR WRAPPER DEL MODAL ---
 function getDistance(touches) {
   return Math.hypot(
     touches[0].clientX - touches[1].clientX,
@@ -302,17 +300,20 @@ function getDistance(touches) {
   );
 }
 
-// 1. EVENTOS PARA IMÁGENES (ZOOM, HOLD Y CIERRE A 1 TAP)
+// Control de tiempo para doble tap exclusivo en video
+let ultimoToqueVideo = 0;
+
+// Mouse (Escritorio)
 modalMediaWrapper.addEventListener('mousedown', (e) => {
-  if (e.button === 0 && modalImg.style.display !== 'none') iniciarPulsacion();
+  if (e.button === 0) iniciarPulsacion();
 });
 modalMediaWrapper.addEventListener('mouseup', cancelarPulsacion);
 modalMediaWrapper.addEventListener('mouseleave', cancelarPulsacion);
 
 let touchMoved = false;
 
+// Táctil (Móvil - Android / iOS)
 modalMediaWrapper.addEventListener('touchstart', (e) => {
-  if (modalImg.style.display === 'none') return;
   touchMoved = false;
 
   if (e.touches.length === 2) {
@@ -330,7 +331,6 @@ modalMediaWrapper.addEventListener('touchstart', (e) => {
 }, { passive: false });
 
 modalMediaWrapper.addEventListener('touchmove', (e) => {
-  if (modalImg.style.display === 'none') return;
   touchMoved = true;
 
   if (e.touches.length === 2) {
@@ -351,14 +351,18 @@ modalMediaWrapper.addEventListener('touchmove', (e) => {
 }, { passive: false });
 
 modalMediaWrapper.addEventListener('touchend', (e) => {
-  if (modalImg.style.display === 'none') return;
-
   if (e.touches.length < 2) {
     lastScale = scale;
   }
 
   if (e.touches.length === 0) {
     isDragging = false;
+
+    // Si el toque fue en el video, ignoramos el evento global (el video gestiona su propio doble tap)
+    if (e.target === modalVideo) {
+      cancelarPulsacion();
+      return;
+    }
 
     if (isPressing) {
       cancelarPulsacion();
@@ -368,7 +372,7 @@ modalMediaWrapper.addEventListener('touchend', (e) => {
 
     cancelarPulsacion();
 
-    // IMAGEN: 1 Tap cierra la pantalla
+    // LÓGICA DE IMÁGENES: 1 Tap abre/cierra
     if (!touchMoved) {
       if (scale > 1) {
         resetZoom();
@@ -384,9 +388,10 @@ modalMediaWrapper.addEventListener('touchcancel', () => {
   isPressing = false;
 });
 
+// Evento clic para escritorio
 modalMediaWrapper.addEventListener('click', (e) => {
-  if (modalImg.style.display === 'none') return;
   e.stopPropagation();
+  if (e.target === modalVideo) return; // En video el clic lo gestiona el reproductor nativo
 
   if (!('ontouchstart' in window)) {
     if (scale > 1) {
@@ -397,11 +402,9 @@ modalMediaWrapper.addEventListener('click', (e) => {
   }
 });
 
-// 2. EVENTOS EXCLUSIVOS PARA VIDEOS (CIERRE EXCLUSIVO A DOBLE TAP)
-let ultimoToqueVideo = 0;
-
+// LÓGICA DE VIDEOS: Doble tap exclusivo sobre el reproductor
 modalVideo.addEventListener('touchend', function(e) {
-  e.stopPropagation();
+  if (touchMoved) return;
 
   const tiempoActual = new Date().getTime();
   const diferenciaToques = tiempoActual - ultimoToqueVideo;
@@ -409,17 +412,12 @@ modalVideo.addEventListener('touchend', function(e) {
   if (diferenciaToques < 300 && diferenciaToques > 0) {
     if (e.cancelable) e.preventDefault();
     cerrarModal();
-    ultimoToqueVideo = 0;
-  } else {
-    ultimoToqueVideo = tiempoActual;
   }
+  
+  ultimoToqueVideo = tiempoActual;
 });
 
-modalVideo.addEventListener('dblclick', function(e) {
-  e.stopPropagation();
-  cerrarModal();
-});
-
+// Clic fuera del contenedor (en el fondo oscuro) para cerrar directamente
 modal.addEventListener('click', (e) => {
   if (e.target === modal) {
     cerrarModal();
