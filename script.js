@@ -202,7 +202,6 @@ fetch(rutaJson)
 
       const esVid = esVideo(urlHD, item.type);
 
-      // Elemento div reemplaza a <a> eliminando por completo el menú de enlaces del navegador
       const anchor = document.createElement('div');
       anchor.className = 'galeria-item';
 
@@ -301,19 +300,8 @@ function getDistance(touches) {
   );
 }
 
-let ultimoToqueModal = 0;
-
-function manejarCierreDobleTap(e) {
-  const tiempoActual = new Date().getTime();
-  const diferenciaTiempo = tiempoActual - ultimoToqueModal;
-
-  if (diferenciaTiempo < 300 && diferenciaTiempo > 0) {
-    if (e.cancelable) e.preventDefault();
-    cerrarModal();
-  }
-  
-  ultimoToqueModal = tiempoActual;
-}
+// Control de tiempo para doble tap exclusivo en video
+let ultimoToqueVideo = 0;
 
 // Mouse (Escritorio)
 modalMediaWrapper.addEventListener('mousedown', (e) => {
@@ -370,7 +358,7 @@ modalMediaWrapper.addEventListener('touchend', (e) => {
   if (e.touches.length === 0) {
     isDragging = false;
 
-    // Si el toque fue directamente sobre el elemento de video, evitamos interferir con sus controles
+    // Si el toque fue en el video, ignoramos el evento global (el video gestiona su propio doble tap)
     if (e.target === modalVideo) {
       cancelarPulsacion();
       return;
@@ -384,11 +372,12 @@ modalMediaWrapper.addEventListener('touchend', (e) => {
 
     cancelarPulsacion();
 
+    // LÓGICA DE IMÁGENES: 1 Tap abre/cierra
     if (!touchMoved) {
       if (scale > 1) {
         resetZoom();
       } else {
-        manejarCierreDobleTap(e);
+        cerrarModal();
       }
     }
   }
@@ -399,28 +388,36 @@ modalMediaWrapper.addEventListener('touchcancel', () => {
   isPressing = false;
 });
 
-// Evento para escritorio
+// Evento clic para escritorio
 modalMediaWrapper.addEventListener('click', (e) => {
   e.stopPropagation();
-  if (e.target === modalVideo) return; // Evita cierres en clics sobre el video en escritorio
+  if (e.target === modalVideo) return; // En video el clic lo gestiona el reproductor nativo
 
   if (!('ontouchstart' in window)) {
     if (scale > 1) {
       resetZoom();
     } else {
-      manejarCierreDobleTap(e);
+      cerrarModal();
     }
   }
 });
 
-// Cierre mediante doble tap exclusivo sobre el reproductor de video
+// LÓGICA DE VIDEOS: Doble tap exclusivo sobre el reproductor
 modalVideo.addEventListener('touchend', function(e) {
-  if (!touchMoved) {
-    manejarCierreDobleTap(e);
+  if (touchMoved) return;
+
+  const tiempoActual = new Date().getTime();
+  const diferenciaToques = tiempoActual - ultimoToqueVideo;
+
+  if (diferenciaToques < 300 && diferenciaToques > 0) {
+    if (e.cancelable) e.preventDefault();
+    cerrarModal();
   }
+  
+  ultimoToqueVideo = tiempoActual;
 });
 
-// Cierre al presionar fuera del contenedor de medios (en el fondo oscuro)
+// Clic fuera del contenedor (en el fondo oscuro) para cerrar directamente
 modal.addEventListener('click', (e) => {
   if (e.target === modal) {
     cerrarModal();
