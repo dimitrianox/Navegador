@@ -14,6 +14,13 @@ body {
   color: #e2e8f0;
   background-color: #070e17;
   font-family: 'Manrope', sans-serif;
+  -webkit-touch-callout: none !important;
+  -webkit-user-select: none !important;
+  -khtml-user-select: none !important;
+  -moz-user-select: none !important;
+  -ms-user-select: none !important;
+  user-select: none !important;
+  -webkit-user-drag: none !important;
 }
 
 /* ENCABEZADO COMPACTO */
@@ -105,7 +112,8 @@ main {
   margin-bottom: 2rem;
 }
 
-main a {
+main a,
+main .galeria-item {
   position: relative;
   display: block;
   overflow: hidden;
@@ -116,19 +124,25 @@ main a {
   transition: border-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
   pointer-events: auto !important;
   touch-action: auto;
+  cursor: pointer;
+  -webkit-touch-callout: none !important;
+  -webkit-user-select: none !important;
+  user-select: none !important;
 }
 
 main a:hover,
-main a:focus {
+main a:focus,
+main .galeria-item:hover,
+main .galeria-item:focus {
   border-color: #d4af37;
   transform: translateY(-2px);
   box-shadow: 0 6px 20px rgba(212, 175, 55, 0.25);
   outline: none;
 }
 
-main a.span-col-2 { grid-column: span 2; }
-main a.span-row-2 { grid-row: span 2; }
-main a.span-big { grid-column: span 2; grid-row: span 2; }
+main a.span-col-2, main .galeria-item.span-col-2 { grid-column: span 2; }
+main a.span-row-2, main .galeria-item.span-row-2 { grid-row: span 2; }
+main a.span-big, main .galeria-item.span-big { grid-column: span 2; grid-row: span 2; }
 
 main img,
 main video {
@@ -143,13 +157,15 @@ main video {
 main a:focus img,
 main a:hover img,
 main a:focus video,
-main a:hover video {
+main a:hover video,
+main .galeria-item:hover img,
+main .galeria-item:hover video {
   filter: brightness(1) contrast(1);
   transform: scale(1.02);
 }
 
 /* =========================================================
-   MODAL - PANTALLA COMPLETA CON TEXTOS ENMARCADOS (CORREGIDO iOS / ANDROID)
+   MODAL - PANTALLA COMPLETA CON TEXTOS ENMARCADOS
    ========================================================= */
 div.modal {
   position: fixed;
@@ -169,6 +185,9 @@ div.modal {
   padding: 12px;
   overflow: hidden !important;
   touch-action: none;
+  -webkit-touch-callout: none !important;
+  -webkit-user-select: none !important;
+  user-select: none !important;
 }
 
 div.modal.overlay {
@@ -190,7 +209,7 @@ div.modal.overlay {
   overflow: hidden;
 }
 
-/* MARCO CONTENEDOR PRINCIPAL - COMPATIBLE CON WEBKIT / iOS / ANDROID */
+/* MARCO CONTENEDOR PRINCIPAL */
 .modal-media-wrapper {
   position: relative;
   flex: 1 1 auto;
@@ -204,6 +223,9 @@ div.modal.overlay {
   cursor: grab;
   pointer-events: auto !important;
   touch-action: none;
+  -webkit-touch-callout: none !important;
+  -webkit-user-select: none !important;
+  user-select: none !important;
 }
 
 .modal-media-wrapper:active {
@@ -225,7 +247,7 @@ div.modal video {
   will-change: transform;
 }
 
-/* ENCABEZADO Y PIE (Estructura de Flujo Flex) */
+/* ENCABEZADO Y PIE */
 .editorial-header {
   width: 100%;
   padding: 8px 0;
@@ -264,7 +286,7 @@ div.modal video {
   display: inline-block;
 }
 
-/* CUADRO DE DESCRIPCIÓN SOBRE LA IMAGEN (TRANSLÚCIDO) */
+/* CUADRO DE DESCRIPCIÓN SOBRE LA IMAGEN */
 .description-overlay {
   position: absolute;
   bottom: 15px;
@@ -331,7 +353,6 @@ div.modal video {
   }
 }
 
-/* DESACTIVACIÓN DE PUNTEROS EN IMÁGENES Y VIDEOS (EVITA MENÚ NATIVO EN BING/NATIVOS) */
 img, video {
   pointer-events: none !important;
   -webkit-touch-callout: none !important;

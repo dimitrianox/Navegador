@@ -202,8 +202,9 @@ fetch(rutaJson)
 
       const esVid = esVideo(urlHD, item.type);
 
-      const anchor = document.createElement('a');
-      anchor.href = '#';
+      // Elemento div reemplaza a <a> eliminando por completo el menú de enlaces del navegador
+      const anchor = document.createElement('div');
+      anchor.className = 'galeria-item';
 
       const claseAzar = clasesTamano[Math.floor(Math.random() * clasesTamano.length)];
       if (claseAzar) anchor.classList.add(claseAzar);
@@ -251,7 +252,7 @@ fetch(rutaJson)
   });
 
 function inicializarEventos() {
-  contenedorGaleria.querySelectorAll('a').forEach(anchor => {
+  contenedorGaleria.querySelectorAll('.galeria-item').forEach(anchor => {
     anchor.addEventListener('contextmenu', anularAccionNativa, true);
 
     anchor.addEventListener('click', (e) => {
@@ -301,12 +302,18 @@ function getDistance(touches) {
 }
 
 // Mouse (Escritorio)
-modalMediaWrapper.addEventListener('mousedown', iniciarPulsacion);
+modalMediaWrapper.addEventListener('mousedown', (e) => {
+  if (e.button === 0) iniciarPulsacion();
+});
 modalMediaWrapper.addEventListener('mouseup', cancelarPulsacion);
 modalMediaWrapper.addEventListener('mouseleave', cancelarPulsacion);
 
-// Táctil (Móvil - Todos los navegadores de Android/iOS)
+let touchMoved = false;
+
+// Táctil (Móvil - Android / iOS)
 modalMediaWrapper.addEventListener('touchstart', (e) => {
+  touchMoved = false;
+
   if (e.touches.length === 2) {
     cancelarPulsacion();
     startDistance = getDistance(e.touches);
@@ -316,13 +323,14 @@ modalMediaWrapper.addEventListener('touchstart', (e) => {
       startX = e.touches[0].clientX - posX;
       startY = e.touches[0].clientY - posY;
     } else {
-      if (e.cancelable) e.preventDefault();
       iniciarPulsacion();
     }
   }
 }, { passive: false });
 
 modalMediaWrapper.addEventListener('touchmove', (e) => {
+  touchMoved = true;
+
   if (e.touches.length === 2) {
     cancelarPulsacion();
     if (e.cancelable) e.preventDefault();
@@ -341,31 +349,46 @@ modalMediaWrapper.addEventListener('touchmove', (e) => {
 }, { passive: false });
 
 modalMediaWrapper.addEventListener('touchend', (e) => {
-  cancelarPulsacion();
   if (e.touches.length < 2) {
     lastScale = scale;
   }
+
   if (e.touches.length === 0) {
     isDragging = false;
-    if (scale <= 1) {
-      resetZoom();
+
+    // Si hubo Hold (pulsación prolongada) para ver la descripción
+    if (isPressing) {
+      cancelarPulsacion();
+      isPressing = false;
+      return;
+    }
+
+    cancelarPulsacion();
+
+    // Tap simple (toque rápido sin deslizamiento)
+    if (!touchMoved) {
+      if (scale > 1) {
+        resetZoom();
+      } else {
+        cerrarModal();
+      }
     }
   }
 });
 
-modalMediaWrapper.addEventListener('touchcancel', cancelarPulsacion);
+modalMediaWrapper.addEventListener('touchcancel', () => {
+  cancelarPulsacion();
+  isPressing = false;
+});
 
 modalMediaWrapper.addEventListener('click', (e) => {
   e.stopPropagation();
-  if (isPressing) {
-    isPressing = false;
-    return;
-  }
-
-  if (scale > 1) {
-    resetZoom();
-  } else {
-    cerrarModal();
+  if (!('ontouchstart' in window)) {
+    if (scale > 1) {
+      resetZoom();
+    } else {
+      cerrarModal();
+    }
   }
 });
 
