@@ -42,7 +42,7 @@ function anularAccionNativa(e) {
   return false;
 }
 
-['contextmenu', 'selectstart', 'dragstart'].forEach(evento => {
+['contextmenu', 'selectstart', 'dragstart', 'hold'].forEach(evento => {
   window.addEventListener(evento, anularAccionNativa, { capture: true, passive: false });
   document.addEventListener(evento, anularAccionNativa, { capture: true, passive: false });
 });
@@ -305,18 +305,25 @@ modalMediaWrapper.addEventListener('mousedown', iniciarPulsacion);
 modalMediaWrapper.addEventListener('mouseup', cancelarPulsacion);
 modalMediaWrapper.addEventListener('mouseleave', cancelarPulsacion);
 
+let touchStartTime = 0;
+let touchStartX = 0;
+let touchStartY = 0;
+
 // Táctil (Móvil - Todos los navegadores de Android/iOS)
 modalMediaWrapper.addEventListener('touchstart', (e) => {
   if (e.touches.length === 2) {
     cancelarPulsacion();
     startDistance = getDistance(e.touches);
   } else if (e.touches.length === 1) {
+    touchStartTime = Date.now();
+    touchStartX = e.touches[0].clientX;
+    touchStartY = e.touches[0].clientY;
+
     if (scale > 1) {
       isDragging = true;
       startX = e.touches[0].clientX - posX;
       startY = e.touches[0].clientY - posY;
     } else {
-      if (e.cancelable) e.preventDefault();
       iniciarPulsacion();
     }
   }
@@ -342,12 +349,26 @@ modalMediaWrapper.addEventListener('touchmove', (e) => {
 
 modalMediaWrapper.addEventListener('touchend', (e) => {
   cancelarPulsacion();
+
   if (e.touches.length < 2) {
     lastScale = scale;
   }
+
   if (e.touches.length === 0) {
+    const duration = Date.now() - touchStartTime;
+    const endX = e.changedTouches[0] ? e.changedTouches[0].clientX : touchStartX;
+    const endY = e.changedTouches[0] ? e.changedTouches[0].clientY : touchStartY;
+    const moveDistance = Math.hypot(endX - touchStartX, endY - touchStartY);
+
     isDragging = false;
-    if (scale <= 1) {
+
+    if (!isPressing && duration < 300 && moveDistance < 10) {
+      if (scale > 1) {
+        resetZoom();
+      } else {
+        cerrarModal();
+      }
+    } else if (scale <= 1) {
       resetZoom();
     }
   }

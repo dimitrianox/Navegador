@@ -14,6 +14,13 @@ body {
   color: #e2e8f0;
   background-color: #070e17;
   font-family: 'Manrope', sans-serif;
+  -webkit-touch-callout: none !important;
+  -webkit-user-select: none !important;
+  -khtml-user-select: none !important;
+  -moz-user-select: none !important;
+  -ms-user-select: none !important;
+  user-select: none !important;
+  -webkit-user-drag: none !important;
 }
 
 /* ENCABEZADO COMPACTO */
@@ -116,6 +123,9 @@ main a {
   transition: border-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
   pointer-events: auto !important;
   touch-action: auto;
+  -webkit-touch-callout: none !important;
+  -webkit-user-select: none !important;
+  user-select: none !important;
 }
 
 main a:hover,
@@ -169,6 +179,9 @@ div.modal {
   padding: 12px;
   overflow: hidden !important;
   touch-action: none;
+  -webkit-touch-callout: none !important;
+  -webkit-user-select: none !important;
+  user-select: none !important;
 }
 
 div.modal.overlay {
@@ -204,6 +217,9 @@ div.modal.overlay {
   cursor: grab;
   pointer-events: auto !important;
   touch-action: none;
+  -webkit-touch-callout: none !important;
+  -webkit-user-select: none !important;
+  user-select: none !important;
 }
 
 .modal-media-wrapper:active {
