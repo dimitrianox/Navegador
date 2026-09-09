@@ -20,7 +20,7 @@ const descOverlay = document.getElementById('description-overlay');
 
 const clasesTamano = ['', '', 'span-col-2', 'span-row-2', 'span-big'];
 
-// Variables para control de Zoom táctil en Modal
+// Variables de estado
 let scale = 1;
 let lastScale = 1;
 let startDistance = 0;
@@ -30,23 +30,16 @@ let startX = 0;
 let startY = 0;
 let isDragging = false;
 
-// Variables para detección de pulsación sostenida (Hold) y Tap
 let pressTimer = null;
 let isPressing = false;
 let touchStartPos = { x: 0, y: 0 };
+let descripcionActiva = '';
 
-// Bloqueo global de menú contextual
+// BLOQUEO ESTRICATO GLOBAL DE MENÚ CONTEXTUAL Y SELECCIÓN
 function anularAccionNativa(e) {
-  if (
-    e.target.tagName === 'IMG' || 
-    e.target.tagName === 'VIDEO' || 
-    e.target.closest('.modal') || 
-    e.target.closest('#galeria')
-  ) {
-    if (e.cancelable) e.preventDefault();
-    e.stopPropagation();
-    return false;
-  }
+  if (e.cancelable) e.preventDefault();
+  e.stopPropagation();
+  return false;
 }
 
 ['contextmenu', 'selectstart', 'dragstart'].forEach(evento => {
@@ -67,7 +60,6 @@ function resolverRuta(url) {
   return rutaCarpeta + url;
 }
 
-// --- FUNCIÓN DE FECHA ---
 function formatearFecha(fechaOriginal) {
   if (!fechaOriginal) return '';
   
@@ -125,9 +117,9 @@ function cerrarModal() {
   resetZoom();
 }
 
-// --- FUNCIONES Y EVENTOS DE DESCRIPCIÓN AL MANTENER PRESIONADO (HOLD) ---
+// --- REVELAR / OCULTAR DESCRIPCIÓN (HOLD) ---
 function mostrarOverlayDesc() {
-  const texto = infoDescripcion.textContent.trim();
+  const texto = descripcionActiva.trim();
   if (texto) {
     descOverlay.textContent = texto;
     descOverlay.classList.add('active');
@@ -144,7 +136,7 @@ function iniciarPulsacion() {
   pressTimer = setTimeout(() => {
     isPressing = true;
     mostrarOverlayDesc();
-  }, 280);
+  }, 250);
 }
 
 function cancelarPulsacion() {
@@ -259,6 +251,8 @@ fetch(rutaJson)
 
 function inicializarEventos() {
   contenedorGaleria.querySelectorAll('a').forEach(anchor => {
+    anchor.addEventListener('contextmenu', anularAccionNativa, true);
+
     anchor.addEventListener('click', (e) => {
       e.preventDefault();
 
@@ -270,8 +264,8 @@ function inicializarEventos() {
       infoFecha.textContent = formatearFecha(anchor.dataset.fecha);
       infoTitulo.textContent = anchor.dataset.titulo;
 
-      const desc = anchor.dataset.descripcion;
-      infoDescripcion.textContent = desc || '';
+      descripcionActiva = anchor.dataset.descripcion || '';
+      infoDescripcion.textContent = descripcionActiva;
 
       if (esVid) {
         modalImg.style.display = 'none';
@@ -297,7 +291,6 @@ function inicializarEventos() {
   });
 }
 
-// --- CONTROL DE GESTOS MOUSE / TÁCTIL EN IMAGEN DEL MODAL ---
 function getDistance(touches) {
   return Math.hypot(
     touches[0].clientX - touches[1].clientX,
@@ -305,12 +298,12 @@ function getDistance(touches) {
   );
 }
 
-// Eventos Escritorio (Mouse)
+// Mouse (Escritorio)
 modalImg.addEventListener('mousedown', iniciarPulsacion);
 modalImg.addEventListener('mouseup', cancelarPulsacion);
 modalImg.addEventListener('mouseleave', cancelarPulsacion);
 
-// Eventos Táctiles (Móvil)
+// Táctil (Móvil)
 modalImg.addEventListener('touchstart', (e) => {
   if (e.touches.length === 2) {
     cancelarPulsacion();
@@ -354,7 +347,6 @@ modalImg.addEventListener('touchend', (e) => {
     lastScale = scale;
   }
 
-  // Si fue un toque rápido sin haber activado la descripción sostenida y sin arrastrar
   if (e.changedTouches.length > 0) {
     const endX = e.changedTouches[0].clientX;
     const endY = e.changedTouches[0].clientY;
@@ -379,7 +371,6 @@ modalImg.addEventListener('touchend', (e) => {
 
 modalImg.addEventListener('touchcancel', cancelarPulsacion);
 
-// Fallback Clic Escritorio
 modalImg.addEventListener('click', (e) => {
   e.stopPropagation();
   if (isPressing) {
@@ -394,7 +385,6 @@ modalImg.addEventListener('click', (e) => {
   }
 });
 
-// Cierre al presionar el área oscura fuera de la imagen
 modal.addEventListener('click', (e) => {
   if (e.target === modal || e.target.classList.contains('modal-media-wrapper')) {
     cerrarModal();
