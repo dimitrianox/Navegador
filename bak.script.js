@@ -301,20 +301,6 @@ function getDistance(touches) {
   );
 }
 
-let ultimoToqueModal = 0;
-
-function manejarCierreDobleTap(e) {
-  const tiempoActual = new Date().getTime();
-  const diferenciaTiempo = tiempoActual - ultimoToqueModal;
-
-  if (diferenciaTiempo < 300 && diferenciaTiempo > 0) {
-    if (e.cancelable) e.preventDefault();
-    cerrarModal();
-  }
-  
-  ultimoToqueModal = tiempoActual;
-}
-
 // Mouse (Escritorio)
 modalMediaWrapper.addEventListener('mousedown', (e) => {
   if (e.button === 0) iniciarPulsacion();
@@ -370,12 +356,7 @@ modalMediaWrapper.addEventListener('touchend', (e) => {
   if (e.touches.length === 0) {
     isDragging = false;
 
-    // Si el toque fue directamente sobre el elemento de video, evitamos interferir con sus controles
-    if (e.target === modalVideo) {
-      cancelarPulsacion();
-      return;
-    }
-
+    // Si hubo Hold (pulsación prolongada) para ver la descripción
     if (isPressing) {
       cancelarPulsacion();
       isPressing = false;
@@ -384,11 +365,12 @@ modalMediaWrapper.addEventListener('touchend', (e) => {
 
     cancelarPulsacion();
 
+    // Tap simple (toque rápido sin deslizamiento)
     if (!touchMoved) {
       if (scale > 1) {
         resetZoom();
       } else {
-        manejarCierreDobleTap(e);
+        cerrarModal();
       }
     }
   }
@@ -399,30 +381,31 @@ modalMediaWrapper.addEventListener('touchcancel', () => {
   isPressing = false;
 });
 
-// Evento para escritorio
 modalMediaWrapper.addEventListener('click', (e) => {
   e.stopPropagation();
-  if (e.target === modalVideo) return; // Evita cierres en clics sobre el video en escritorio
-
   if (!('ontouchstart' in window)) {
     if (scale > 1) {
       resetZoom();
     } else {
-      manejarCierreDobleTap(e);
+      cerrarModal();
     }
   }
 });
 
-// Cierre mediante doble tap exclusivo sobre el reproductor de video
-modalVideo.addEventListener('touchend', function(e) {
-  if (!touchMoved) {
-    manejarCierreDobleTap(e);
+modal.addEventListener('click', (e) => {
+  if (e.target === modal || e.target.classList.contains('modal-media-wrapper')) {
+    cerrarModal();
   }
 });
 
-// Cierre al presionar fuera del contenedor de medios (en el fondo oscuro)
-modal.addEventListener('click', (e) => {
-  if (e.target === modal) {
+let ultimoToqueVideo = 0;
+modalVideo.addEventListener('touchend', function(e) {
+  const tiempoActual = new Date().getTime();
+  const diferenciaToques = tiempoActual - ultimoToqueVideo;
+
+  if (diferenciaToques < 300 && diferenciaToques > 0) {
+    if (e.cancelable) e.preventDefault();
     cerrarModal();
   }
+  ultimoToqueVideo = tiempoActual;
 });
