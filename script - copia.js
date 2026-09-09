@@ -31,13 +31,11 @@ let startX = 0;
 let startY = 0;
 let isDragging = false;
 
-// Variables para detección de pulsación sostenida (Hold) y Tap
+// Variables para detección de pulsación sostenida (Hold)
 let pressTimer = null;
 let isPressing = false;
-let touchStartTime = 0;
-let touchStartPos = { x: 0, y: 0 };
 
-// Bloqueo global de menús contextuales en fase de captura
+// Bloqueo estricto global en fase de captura
 function anularAccionNativa(e) {
   if (e.cancelable) e.preventDefault();
   e.stopPropagation();
@@ -62,7 +60,7 @@ function resolverRuta(url) {
   return rutaCarpeta + url;
 }
 
-// --- FUNCIÓN DE FECHA ---
+// --- FUNCIÓN DE FECHA CORREGIDA ---
 function formatearFecha(fechaOriginal) {
   if (!fechaOriginal) return '';
   
@@ -294,7 +292,7 @@ function inicializarEventos() {
   });
 }
 
-// --- CONTROL DE GESTOS MOUSE Y TÁCTIL (ZOOM, HOLD Y CIERRE POR TOQUE) ---
+// --- CONTROL DE GESTOS EN EL CONTENEDOR WRAPPER DEL MODAL ---
 function getDistance(touches) {
   return Math.hypot(
     touches[0].clientX - touches[1].clientX,
@@ -302,44 +300,27 @@ function getDistance(touches) {
   );
 }
 
-// Control Escritorio (Mouse)
-modalMediaWrapper.addEventListener('mousedown', (e) => {
-  touchStartTime = Date.now();
-  iniciarPulsacion();
-});
-
-modalMediaWrapper.addEventListener('mouseup', (e) => {
-  cancelarPulsacion();
-  const duration = Date.now() - touchStartTime;
-  if (!isPressing && duration < 250) {
-    if (scale > 1) {
-      resetZoom();
-    } else {
-      cerrarModal();
-    }
-  }
-});
-
+// Mouse (Escritorio)
+modalMediaWrapper.addEventListener('mousedown', iniciarPulsacion);
+modalMediaWrapper.addEventListener('mouseup', cancelarPulsacion);
 modalMediaWrapper.addEventListener('mouseleave', cancelarPulsacion);
 
-// Control Móvil Táctil (Android / iOS)
+// Táctil (Móvil - Todos los navegadores de Android/iOS)
 modalMediaWrapper.addEventListener('touchstart', (e) => {
-  touchStartTime = Date.now();
-  
   if (e.touches.length === 2) {
     cancelarPulsacion();
     startDistance = getDistance(e.touches);
   } else if (e.touches.length === 1) {
-    touchStartPos = { x: e.touches[0].clientX, y: e.touches[0].clientY };
     if (scale > 1) {
       isDragging = true;
       startX = e.touches[0].clientX - posX;
       startY = e.touches[0].clientY - posY;
     } else {
+      if (e.cancelable) e.preventDefault();
       iniciarPulsacion();
     }
   }
-}, { passive: true });
+}, { passive: false });
 
 modalMediaWrapper.addEventListener('touchmove', (e) => {
   if (e.touches.length === 2) {
@@ -361,26 +342,9 @@ modalMediaWrapper.addEventListener('touchmove', (e) => {
 
 modalMediaWrapper.addEventListener('touchend', (e) => {
   cancelarPulsacion();
-  const duration = Date.now() - touchStartTime;
-
   if (e.touches.length < 2) {
     lastScale = scale;
   }
-
-  if (e.changedTouches.length > 0) {
-    const endPos = { x: e.changedTouches[0].clientX, y: e.changedTouches[0].clientY };
-    const distMoved = Math.hypot(endPos.x - touchStartPos.x, endPos.y - touchStartPos.y);
-
-    // Si fue un toque rápido (< 250ms) y sin desplazamiento significativo (< 10px)
-    if (!isPressing && duration < 250 && distMoved < 10) {
-      if (scale > 1) {
-        resetZoom();
-      } else {
-        cerrarModal();
-      }
-    }
-  }
-
   if (e.touches.length === 0) {
     isDragging = false;
     if (scale <= 1) {
@@ -391,7 +355,20 @@ modalMediaWrapper.addEventListener('touchend', (e) => {
 
 modalMediaWrapper.addEventListener('touchcancel', cancelarPulsacion);
 
-// Cierre al hacer clic fuera del contenido del modal
+modalMediaWrapper.addEventListener('click', (e) => {
+  e.stopPropagation();
+  if (isPressing) {
+    isPressing = false;
+    return;
+  }
+
+  if (scale > 1) {
+    resetZoom();
+  } else {
+    cerrarModal();
+  }
+});
+
 modal.addEventListener('click', (e) => {
   if (e.target === modal || e.target.classList.contains('modal-media-wrapper')) {
     cerrarModal();
