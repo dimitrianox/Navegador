@@ -294,7 +294,7 @@ div.modal video {
   transform: translateX(-50%);
   width: 88%;
   max-width: 520px;
-  background: rgba(7, 14, 23, 0.75);
+  background: rgba(7, 14, 23, 0.35);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   border: 1px solid rgba(184, 145, 70, 0.6);
